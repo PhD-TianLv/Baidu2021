@@ -19,8 +19,12 @@ class Cart:
         portx = "/dev/ttyUSB0"
         bps = 115200
         self.serial = serial.Serial(portx, int(bps), timeout=1, parity=serial.PARITY_NONE, stopbits=1)
+
+        # params
         self.min_angle = -2.0
         self.max_angle = 2.0
+        self.velocity = 50
+        self.angle_changeValue = 0.2
 
     def steer(self, speed, angle):
         speed = int(speed) if speed else int(self.speed)

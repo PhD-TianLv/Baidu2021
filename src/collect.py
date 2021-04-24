@@ -50,21 +50,25 @@ class Logger:
             # 将记录 axis 改为记录 cart.angle 并归一化
             self.map[self.counter] = cart.angle / 4
             cv2.imwrite(path, image)
+            if self.counter % 100 == 0:
+                print('logging, count = {}'.format(self.counter))
             self.counter = self.counter + 1
-            print('logging, count = {}'.format(self.counter))
 
     def stopped(self):
         return self.stopped_
 
 
-def joystick_thread(js, cart, logger):
+def JsRunThread(js, cart, logger):
     while True:
+        cart.steer(cart.speed, cart.angle)
+
         time, value, type_, number = js.read()
-        # Key = X | log started
+        # Key = X | log started | angle = 0
         if type_ == 1 and number == 3 and value == 1:
-            cart.speed = 50  # Speed
+            cart.speed = cart.velocity
+            cart.angle = 0
             logger.start()
-            print('Key[X] down, log started, run at {}'.format(cart.speed))
+            print('Key[X] down, log started, run at {}, angle = {:.1f}'.format(cart.speed, cart.angle))
 
         # Key = B | cart stopped | log paused | keep the value of angle
         if type_ == 1 and number == 1 and value == 1:
@@ -73,25 +77,25 @@ def joystick_thread(js, cart, logger):
             print('Key[B] down, log paused, car stopped')
 
         # Key = Y | angle = 0
-        if type_ == 1 and number == 4 and value == 1:
-            cart.angle = 0
-            print('Key[Y] down, angle = 0')
+        # if type_ == 1 and number == 4 and value == 1:
+        #     cart.angle = 0
+        #     print('Key[Y] down, angle = 0')
 
-        # Key = LEFT | angle -= 0.25
+        # Key = LEFT | angle -= cart.angle_changeValue
         if type_ == 2 and number == 6 and value == -32767:
             if cart.angle == cart.min_angle:
-                print('Key[LEFT] down, angle == -2.0, maximizing')
+                print('Key[LEFT] down, angle == {:.1f}, maximizing'.format(cart.min_angle))
             else:
-                cart.angle -= 0.25
-                print('Key[LEFT] down, angle -= 0.25, now angle = {}'.format(cart.angle))
+                cart.angle -= cart.angle_changeValue
+                print('Key[LEFT] down, angle -= {:.1f}, now angle = {:.1f}'.format(cart.angle_changeValue, cart.angle))
 
-        # Key = RIGHT | angle += 0.25
+        # Key = RIGHT | angle += cart.angle_changeValue
         if type_ == 2 and number == 6 and value == 32767:
             if cart.angle == cart.max_angle:
-                print('Key[RIGHT] down, angle == 2.0, maximizing')
+                print('Key[RIGHT] down, angle == {:.1f}, maximizing'.format(cart.max_angle))
             else:
-                cart.angle += 0.25
-                print('Key[RIGHT] down, angle += 0.25, now angle = {}'.format(cart.angle))
+                cart.angle += cart.angle_changeValue
+                print('Key[RIGHT] down, angle += {:.1f}, now angle = {:.1f}'.format(cart.angle_changeValue, cart.angle))
 
 
 if __name__ == "__main__":
@@ -100,12 +104,15 @@ if __name__ == "__main__":
     logger = Logger()
     cart = Cart()
 
-    js_thread = threading.Thread(target=joystick_thread, args=(js, cart, logger))
-    js_thread.start()
+    # param
+    cart.velocity = 50
+
+    js_run_thread = threading.Thread(target=JsRunThread, args=(js, cart, logger))
+    js_run_thread.start()
     print('Init complete, wait for instruction')
 
-    while not logger.stopped():
+    while True:
         logger.log()
 
-    js_thread.join()
+    js_run_thread.join()
     cart.stop()
