@@ -6,7 +6,7 @@
 """
 
 from joystick import JoyStick
-from old_cart import Cart
+from cart import Cart
 import time
 import cv2
 import threading
@@ -74,7 +74,7 @@ def joystick_thread(js, cart, logger):
 
         # Key = LEFT | angle -= 0.25
         if type_ == 2 and number == 6 and value == -32767:
-            if cart.angle == cart.min_speed:
+            if cart.angle == cart.min_angle:
                 print('Key[LEFT] down, angle == -2.0, maximizing')
             else:
                 cart.angle -= 0.25
@@ -82,7 +82,7 @@ def joystick_thread(js, cart, logger):
 
         # Key = RIGHT | angle += 0.25
         if type_ == 2 and number == 6 and value == 32767:
-            if cart.angle == cart.max_speed:
+            if cart.angle == cart.max_angle:
                 print('Key[RIGHT] down, angle == 2.0, maximizing')
             else:
                 cart.angle += 0.25
