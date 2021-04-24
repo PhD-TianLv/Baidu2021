@@ -3,7 +3,7 @@ import threading
 # 若不连接 WOBOT 控制器，则注释以下内容
 from serial_port import serial_connection
 from widgets import Light, Servo, Motor_rotate
-from old_cart import Cart
+from cart import Cart
 
 serial = serial_connection
 

@@ -54,8 +54,8 @@ class Cart:
         return speed
 
     def move(self, speeds):
-        left_front = int(speeds[0])
-        right_front = -int(speeds[1])
+        left_front = -int(speeds[0])
+        right_front = int(speeds[1])
         left_rear = int(speeds[2])
         right_rear = -int(speeds[3])
 

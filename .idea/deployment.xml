@@ -5,15 +5,7 @@
       <paths name="EdgeBoard">
         <serverdata>
           <mappings>
-            <mapping deploy="/workspace/autostart" local="$PROJECT_DIR$" web="/" />
-            <mapping local="" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="myUbuntu">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/home/root/workspace/autostart" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>

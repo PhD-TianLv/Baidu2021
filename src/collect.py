@@ -12,6 +12,7 @@ import cv2
 import threading
 import json
 import config
+import os
 
 
 class Logger:
@@ -23,6 +24,8 @@ class Logger:
         self.counter = 0
         self.map = {}
         self.result_dir = "../train"
+        if not os.path.exists(self.result_dir):
+            os.makedirs(self.result_dir)
 
     def start(self):
         self.started = True
@@ -42,6 +45,7 @@ class Logger:
         path = "{}/result.json".format(self.result_dir)
         with open(path, 'w') as fp:
             json.dump(self.map.copy(), fp)
+
 
     def log(self):
         if self.started:
