@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig authType="PASSWORD" host="192.168.1.254" id="e77ff3bd-723b-4c62-a13a-661831bc490f" port="22" customName="EdgeBoard" nameFormat="CUSTOM" username="root">
+        <option name="customName" value="EdgeBoard" />
+      </sshConfig>
+    </configs>
+  </component>
+</project>

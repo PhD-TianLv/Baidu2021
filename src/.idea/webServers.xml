@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="33cf1a17-10f9-4f07-988e-cc4ffe3abac0" name="EdgeBoard">
+        <fileTransfer rootFolder="/home/root" accessType="SFTP" host="192.168.1.254" port="22" sshConfigId="e77ff3bd-723b-4c62-a13a-661831bc490f" sshConfig="EdgeBoard">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
