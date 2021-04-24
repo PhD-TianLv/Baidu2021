@@ -28,7 +28,11 @@ class Logger:
         self.started = True
 
     def pause(self):
+        # 暂停，同时保存 angle 数据文件
         self.started = False
+        path = "{}/result.json".format(self.result_dir)
+        with open(path, 'w') as fp:
+            json.dump(self.map.copy(), fp)
 
     def stop(self):
         if self.stopped_:
@@ -39,7 +43,7 @@ class Logger:
         with open(path, 'w') as fp:
             json.dump(self.map.copy(), fp)
 
-    def log(self, axis):
+    def log(self):
         if self.started:
             return_value, image = self.camera.read()
             path = "{}/{}.jpg".format(self.result_dir, self.counter)
@@ -47,6 +51,7 @@ class Logger:
             self.map[self.counter] = cart.angle / 4
             cv2.imwrite(path, image)
             self.counter = self.counter + 1
+            print('logging, count = {}'.format(self.counter))
 
     def stopped(self):
         return self.stopped_
@@ -91,14 +96,16 @@ def joystick_thread(js, cart, logger):
 
 if __name__ == "__main__":
     js = JoyStick()
+    js.open()
     logger = Logger()
     cart = Cart()
 
     js_thread = threading.Thread(target=joystick_thread, args=(js, cart, logger))
     js_thread.start()
+    print('Init complete, wait for instruction')
+
     while not logger.stopped():
-        # time.sleep(0.01)
-        logger.log(js.x_axis)
+        logger.log()
 
     js_thread.join()
     cart.stop()
