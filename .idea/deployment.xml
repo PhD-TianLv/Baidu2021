@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="EdgeBoard" remoteFilesAllowedToDisappearOnAutoupload="false">
+  <component name="PublishConfigData" autoUpload="Always" serverName="EdgeBoard" preserveTimestamps="false" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
       <paths name="EdgeBoard">
         <serverdata>
           <mappings>
             <mapping deploy="/home/root/workspace/autostart" local="$PROJECT_DIR$" />
+            <mapping local="" />
           </mappings>
         </serverdata>
       </paths>
