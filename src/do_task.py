@@ -1,8 +1,6 @@
-from widgets import Servo, Servo_pwm, Motor_rotate, Magneto_sensor, UltrasonicSensor, Light, Buzzer
 from widgets import *
-from driver import Driver, SLOW_DOWN_RATE
+from driver import Driver
 import time
-import old_cart
 
 
 #升旗任务

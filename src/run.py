@@ -1,14 +1,9 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-import sys
-import datetime
 import time
-import cv2
-import config
 from widgets import Button
 from camera import Camera
 from cruiser import Cruiser
-from old_cart import Cart
 from config import front_cam
 from driver import Driver
 

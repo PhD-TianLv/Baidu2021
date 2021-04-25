@@ -39,7 +39,7 @@ def idle_handler(arg):
         if start_button.clicked():
             time.sleep(0.3)
             return STATE_CRUISE, None
-        print("IDLE")
+        # print("IDLE") # DEBUG
         driver.stop()
     return STATE_IDLE, None
 
@@ -58,7 +58,7 @@ def cruise_handler(arg):
                 driver.set_speed(driver.full_speed)
         if check_stop(STATE_CRUISE):
             return STATE_IDLE, None
-        print("cruise")
+        # print("cruise") # DEBUG
         front_image = front_camera.read()
         driver.go(front_image)
 

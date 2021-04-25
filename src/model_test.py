@@ -7,14 +7,14 @@ import config
 import time
 
 #测试图片存放位置和测试输出结果位置
-cruiser_images_dir = "test/cruise"
-cruiser_result_dir = "test/cruise_res"
-task_images_dir = "test/task"
-task_result_dir = "test/task_res"
-sign_images_dir = "test/sign"
-sign_result_dir = "test/sign_res"
-front_image_dir = "test/front"
-front_result_dir = "test/front_res"
+cruiser_images_dir = "../data/test/cruise"
+cruiser_result_dir = "../data/test/cruise_res"
+task_images_dir = "../data/test/task"
+task_result_dir = "../data/test/task_res"
+sign_images_dir = "../data/test/sign"
+sign_result_dir = "../data/test/sign_res"
+front_image_dir = "../data/test/front"
+front_result_dir = "../data/test/front_res"
 
 image_extensions = [".png", ".jpg", ".jpeg"]
 

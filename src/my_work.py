@@ -100,8 +100,9 @@ def test_sign():
 def test_cart():
     cart = Cart()
     while True:
-        cart.steer(angle=-2)
-        # cart.move([80, 80, 80, 80])
+        cart.steer(speed=50, angle=1)
+        # cart.move([-50, 50, -50, 50])
+        # cart.move([0, 0, 0, 50])
 
 
 def test_thread():
@@ -166,6 +167,6 @@ if __name__ == '__main__':
     # test_motor(1)
     # test_joystick()
     # test_cam_cruiseModel()
-    # test_cart()
+    test_cart()
     # test_img_cruiseModel()
-    test_joystick_run()
+    # test_joystick_run()

@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
 from serial_port import serial_connection
 
 from ctypes import *
@@ -24,7 +27,7 @@ class Cart:
         self.min_angle = -2.0
         self.max_angle = 2.0
         self.velocity = 50
-        self.angle_changeValue = 0.2
+        self.change_in_angle = 0.2
 
     def steer(self, speed, angle):
         speed = int(speed) if speed else int(self.speed)
@@ -54,10 +57,12 @@ class Cart:
         return speed
 
     def move(self, speeds):
-        left_front = -int(speeds[0])
-        right_front = int(speeds[1])
+        left_front = int(speeds[0])
+        right_front = -int(speeds[1])
         left_rear = int(speeds[2])
         right_rear = -int(speeds[3])
+        # print('left_front = {}, right_front = {}, '
+        #       'left_rear = {}, right_rear = {}'.format(left_front, right_front, left_rear, right_rear))  # DEBUG
 
         left_front = self.exchange(left_front)
         right_front = self.exchange(right_front)
