@@ -24,14 +24,11 @@ stop_button = Button(1, "DOWN")
 
 STATE_IDLE = "idle"
 STATE_CRUISE = "cruise"
-
-
 #确认"DOWN"按键是否按下，程序是否处于等待直行状态
 def check_stop(current_state):
     if current_state != STATE_IDLE and stop_button.clicked():
         return True
     return False
-
 
 #任务程序入口函数
 def idle_handler(arg):
@@ -39,10 +36,9 @@ def idle_handler(arg):
         if start_button.clicked():
             time.sleep(0.3)
             return STATE_CRUISE, None
-        # print("IDLE") # DEBUG
+        print("IDLE")
         driver.stop()
     return STATE_IDLE, None
-
 
 def cruise_handler(arg):
     #设置小车巡航速度
@@ -58,16 +54,14 @@ def cruise_handler(arg):
                 driver.set_speed(driver.full_speed)
         if check_stop(STATE_CRUISE):
             return STATE_IDLE, None
-        # print("cruise") # DEBUG
+        print("cruise")
         front_image = front_camera.read()
         driver.go(front_image)
-
 
 state_map = {
     STATE_IDLE: idle_handler,
     STATE_CRUISE: cruise_handler
 }
-
 
 def main():
     front_camera.start()
@@ -83,7 +77,7 @@ def main():
     Lightwork(4, "off")
     current_state = STATE_IDLE
     arg = None
-    while True:
+    while (True):
         print(current_state)
         new_state, arg = state_map[current_state](arg)
         current_state = new_state
@@ -92,6 +86,5 @@ def main():
     front_camera.stop()
     side_camera.stop()
 
-
-if __name__ == '__main__':
+if __name__=='__main__':
     main()

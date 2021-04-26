@@ -2,7 +2,7 @@
 <project version="4">
   <component name="WebServers">
     <option name="servers">
-      <webServer id="6cf3c2a9-5d06-4bba-a644-6058aa974a3d" name="EdgeBoard">
+      <webServer id="6cf3c2a9-5d06-4bba-a644-6058aa974a3d" name="EdgeBoard (project level)">
         <fileTransfer accessType="SFTP" host="192.168.1.254" port="22" sshConfigId="6fb74d08-3004-4b1c-b507-b920231a656d" sshConfig="EdgeBoard" />
       </webServer>
     </option>

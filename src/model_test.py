@@ -1,23 +1,21 @@
 import os
 import cv2
 from cruiser import Cruiser
-from detectors import SignDetector, TaskDetector
+from detectors import SignDetector,TaskDetector
 from camera import Camera
 import config
 import time
-
 #测试图片存放位置和测试输出结果位置
-cruiser_images_dir = "../data/test/cruise"
-cruiser_result_dir = "../data/test/cruise_res"
-task_images_dir = "../data/test/task"
-task_result_dir = "../data/test/task_res"
-sign_images_dir = "../data/test/sign"
-sign_result_dir = "../data/test/sign_res"
-front_image_dir = "../data/test/front"
-front_result_dir = "../data/test/front_res"
+cruiser_images_dir = "test/cruise"
+cruiser_result_dir = "test/cruise_res"
+task_images_dir = "test/task"
+task_result_dir = "test/task_res"
+sign_images_dir = "test/sign"
+sign_result_dir = "test/sign_res"
+front_image_dir = "test/front"
+front_result_dir = "test/front_res"
 
-image_extensions = [".png", ".jpg", ".jpeg"]
-
+image_extensions = [".png",".jpg",".jpeg"]
 
 def read_dir(dir_path):
     files = []
@@ -27,10 +25,8 @@ def read_dir(dir_path):
             files.append(filename)
     return files
 
-
 def save_image(frame, save_path):
     cv2.imwrite(save_path, frame)
-
 
 def draw_cruise_result(frame, res):
     color = (0, 244, 10)
@@ -42,10 +38,9 @@ def draw_cruise_result(frame, res):
     fontScale = 1
     txt = "{:.4f}".format(round(res, 5))
     frame = cv2.putText(frame, txt, org, font,
-                        fontScale, color, thickness, cv2.LINE_AA)
-    print("angle=", txt)
+                       fontScale, color, thickness, cv2.LINE_AA)
+    print("angle=",txt)
     return frame
-
 
 def draw_res(frame, results):
     res = list(frame.shape)
@@ -66,14 +61,12 @@ def draw_res(frame, results):
         org = start_point[0], start_point[1] - 10
         fontScale = 1
         frame = cv2.putText(frame, item.name, org, font,
-                            fontScale, color, thickness, cv2.LINE_AA)
+                           fontScale, color, thickness, cv2.LINE_AA)
         return frame
-
-
 #对前向摄像头拍摄的视频文件进行模型推理。
 def test_front_video():
     #视频文件
-    cap = cv2.VideoCapture('run.avi')
+    cap=cv2.VideoCapture('run.avi')
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
     time.sleep(1)
@@ -84,9 +77,9 @@ def test_front_video():
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
     out = cv2.VideoWriter('./' + time_name + '.avi', fourcc, 6, (640, 480))
     while True:
-        ret, front_image = cap.read()
-        cruise_result = cruiser.cruise(front_image)
-        frame = draw_cruise_result(front_image, cruise_result)
+        ret,front_image = cap.read()
+        cruise_result = cruiser.cruise(front_image )
+        frame = draw_cruise_result(front_image , cruise_result)
         signs, index = sd.detect(frame)
         draw_res(frame, signs)
         # frame = cv2.flip(frame, 2)
@@ -97,8 +90,6 @@ def test_front_video():
     cap.release()
     out.release()
     cv2.destroyAllWindows()
-
-
 #对前向摄像头拍摄图片进行动态识别，包括车道值，不同的车道值代表了不同的转弯强度
 def test_cruise():
     front_camera = Camera(config.front_cam, [640, 480])
@@ -108,15 +99,13 @@ def test_cruise():
     time.sleep(1)
     while True:
         front_image = front_camera.read()
-        cruise_result = cruiser.cruise(front_image)
-        frame = draw_cruise_result(front_image, cruise_result)
+        cruise_result = cruiser.cruise(front_image )
+        frame = draw_cruise_result(front_image , cruise_result)
         cv2.imshow("Output", frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     front_camera.stop()
     cv2.destroyAllWindows()
-
-
 #前向车道地面标志动态识别
 def test_sign():
     front_camera = Camera(config.front_cam, [640, 480])
@@ -127,8 +116,8 @@ def test_sign():
     time.sleep(1)
     while True:
         front_image = front_camera.read()
-        cruise_result = cruiser.cruise(front_image)
-        frame = draw_cruise_result(front_image, cruise_result)
+        cruise_result = cruiser.cruise(front_image )
+        frame = draw_cruise_result(front_image , cruise_result)
         signs, index = sd.detect(frame)
         draw_res(frame, signs)
         cv2.imshow("Output", frame)
@@ -136,8 +125,6 @@ def test_sign():
             break
     front_camera.stop()
     cv2.destroyAllWindows()
-
-
 #侧向任务动态识别
 def test_task():
     side_camera = Camera(config.side_cam, [640, 480])
@@ -155,7 +142,6 @@ def test_task():
     side_camera.stop()
     cv2.destroyAllWindows()
 
-
 #前向车道和地面标志图片识别
 def test_front():
     cruiser = Cruiser()
@@ -166,11 +152,10 @@ def test_front():
         frame = cv2.imread(file_path)
         cruise_result = cruiser.cruise(frame)
         frame = draw_cruise_result(frame, cruise_result)
-        signs, index = sd.detect(frame)
+        signs,index = sd.detect(frame)
         save_path = os.path.join(front_result_dir, filename)
         draw_res(frame, signs)
         save_image(frame, save_path)
-
 
 #侧向任务模型图片识别
 def test_task_detector():
@@ -184,7 +169,6 @@ def test_task_detector():
         draw_res(frame, tasks)
         save_path(frame, save_path)
 
-
 #前向车道地面标志识别
 def test_sign_detector():
     sd = SignDetector()
@@ -192,7 +176,7 @@ def test_sign_detector():
     for filename in files:
         file_path = os.path.join(sign_images_dir, filename)
         frame = cv2.imread(file_path)
-        tasks, index = sd.detect(frame)
+        tasks,index = sd.detect(frame)
         save_path = os.path.join(sign_result_dir, filename)
         draw_res(frame, tasks)
         save_image(frame, save_path)

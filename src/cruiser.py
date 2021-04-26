@@ -24,7 +24,7 @@ def process_image(frame, size, ms):
 # CNN网络预处理
 def cnn_preprocess(args, img, buf):
     shape = args["shape"]
-    img = process_image(img, shape[2], args["ms"])
+    img = process_image(img, shape[2], args["ms"]);
     hwc_shape = list(shape)
     hwc_shape[3], hwc_shape[1] = hwc_shape[1], hwc_shape[3]
     data = buf
@@ -53,10 +53,12 @@ class Cruiser:
         self.predictor.load(cruise_model)
 
     def cruise(self, frame):
-        res = infer_cnn(self.predictor, self.buf, frame)
+        res = infer_cnn(self.predictor, self.buf, frame);
         # print(res)
-        return res
+        return res;
 
 
 if __name__ == "__main__":
     c = Cruiser()
+    test_image = cv2.imread('test/cruise/7.png')
+    print(c.cruise(test_image))

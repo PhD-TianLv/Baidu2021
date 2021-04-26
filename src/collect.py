@@ -43,7 +43,6 @@ class Logger:
 
     def stop(self, lock):
         path = os.path.join(self.result_dir, 'result.json')
-        cart.stop()
 
         lock.acquire()
         with open(path, 'w') as fp:
@@ -64,8 +63,8 @@ class Logger:
         lock.release()
 
 
-def JsRunThread(js, cart, logger):
-    while True:
+def JsRunThread(run_flag, js, cart, logger):
+    while run_flag:
         # Run
         cart.steer(cart.speed, cart.angle)
 
@@ -106,30 +105,34 @@ def JsRunThread(js, cart, logger):
                 print('Key[RIGHT] down, angle += {:.1f}, now angle = {:.1f}'.format(cart.change_in_angle, cart.angle))
 
 
-def LogThread(logger, lock):
-    while True:
+def LogThread(run_flag, logger, lock):
+    while run_flag:
         if logger.started:
             logger.log(lock)
 
 
 if __name__ == "__main__":
     js = JoyStick()
-    js.open()
     logger = Logger()
     cart = Cart()
     lock = Lock()
+    run_flag = True
 
-    # param
+    # param set
     cart.velocity = 50
 
-    js_run_thread = Thread(target=JsRunThread, args=(js, cart, logger))
-    log_thread = Thread(target=LogThread, args=(logger, lock))
+    js_run_thread = Thread(target=JsRunThread, args=(run_flag, js, cart, logger))
+    log_thread = Thread(target=LogThread, args=(run_flag, logger, lock))
     js_run_thread.start()
     log_thread.start()
     print('Init complete, wait for instruction')
 
     while True:
-        logger.log()
+        pass
 
+    # end of program
+    run_flag = False
     js_run_thread.join()
+    log_thread.join()
     logger.stop()
+    cart.stop()

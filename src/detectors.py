@@ -10,8 +10,6 @@ ssd_args = {
     "shape": [1, 3, 480, 480],
     "ms": [127.5, 0.007843]
 }
-
-
 def name_to_index(name, label_list):
     for k, v in label_list.items():
         if v == name:
@@ -60,7 +58,7 @@ def infer_ssd(predictor, image):
 
 # score较高
 def is_sign_valid(o):
-    valid = False
+    valid = False;
     if o[1] > config.sign["threshold"]:
         valid = True
     return valid
@@ -83,7 +81,7 @@ class DetectionResult:
         self.relative_center_y = -1
 
     def __repr__(self):
-        return "name:{} scroe:{}".format(self.name, self.score)
+        return "name:{} scroe:{}".format(self.name, self.score);
 
 
 def clip_box(box):
@@ -93,8 +91,7 @@ def clip_box(box):
     h = ymax - ymin
     w = xmax - xmin
     scale = config.EMLARGE_RATIO
-    return max(x_center - scale * w / 2, 0), max(y_center - scale * h / 2, 0), min(x_center + scale * w / 2, 1), min(
-        y_center + scale * h / 2, 1)
+    return max(x_center - scale * w / 2, 0), max(y_center - scale * h / 2, 0), min(x_center + scale*w / 2, 1), min(y_center + scale * h / 2, 1)
 
 
 def in_centered_in_image(res):
@@ -106,7 +103,7 @@ def in_centered_in_image(res):
         relative_box = item.relative_box
         relative_box = clip_box(relative_box)
         relative_center_x = (relative_box[0] + relative_box[2]) / 2
-        print(">>>>>>>>>>>>>>>>>>>>>relative_center_x=", relative_center_x)
+        print(">>>>>>>>>>>>>>>>>>>>>relative_center_x=",relative_center_x)
         if relative_center_x < config.mission_high and relative_center_x > config.mission_low:
             return True
     return False
@@ -199,59 +196,54 @@ class TaskDetector:
                 results.append(res_to_detection(item, self.label_list, frame))
         return results
 
-
 def test_task_detector():
     td = TaskDetector()
     print("********************************")
-    for i in range(1, 30):
+    for i in range(1,30):
         frame = cv2.imread("image/{}.png".format(i))
         tasks = td.detect(frame)
-        print("image/{}.png: ".format(i), tasks)
+        print("image/{}.png: ".format(i),tasks)
     print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-
 
 def test_sign_detector():
     sd = SignDetector()
     print("********************************")
-    for i in range(0, 68):
+    for i in range(0,68):
         frame = cv2.imread("image/{}.png".format(i))
         signs, index = sd.detect(frame)
-        print("image/{}.png: ".format(i), signs)
+        print("image/{}.png: ".format(i),signs)
         print(index)
     print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-
 
 def test_front_detector():
     sd = SignDetector()
     print("********************************")
-    for i in range(0, 68):
+    for i in range(0,68):
         frame = cv2.imread("front/{}.jpg".format(i))
         signs, index = sd.detect(frame)
-        print("front/{}.jpg: ".format(i), signs)
+        print("front/{}.jpg: ".format(i),signs)
         print(index)
-        if signs != []:
-            print("signs=", signs[0].name, "signs_scroe=", signs[0].score)
+        if signs!=[]:
+            print("signs=",signs[0].name,"signs_scroe=",signs[0].score)
     print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-
 
 if __name__ == "__main__":
     # test_task_detector()
     # test_sign_detector()
     # test_front_detector()
     task_detector = TaskDetector()
-    sign_detector = SignDetector()
+    sign_detector=SignDetector()
     front_camera = Camera(config.front_cam, [640, 480])
     side_camera = Camera(config.side_cam, [640, 480])
-    num = 0
-    imgnum = 0
+    num=0
+    imgnum=0
     from driver import Driver
-
-    driver = Driver()
+    driver=Driver()
     driver.set_speed(driver.full_speed * 0.6)
     front_camera.start()
     side_camera.start()
     while True:
-        num += 1
+        num+=1
         # side_camera.update()
         front_image = front_camera.read()
         driver.go(front_image)
@@ -265,8 +257,8 @@ if __name__ == "__main__":
         # print("*****************sidecam=", res,"num=",num)
         # res = task_detector.detect(side_image)
         # print("*****************sidecam=", res,"num=",num)
-        res, index = sign_detector.detect(front_image)
-        print("*****************sidecam=", res, "num=", num)
+        res,index = sign_detector.detect(front_image)
+        print("*****************sidecam=", res,"num=",num)
         # time.sleep(0.05)
     front_camera.stop()
     side_camera.stop()

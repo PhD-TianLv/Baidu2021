@@ -4,12 +4,10 @@ This module defines common interface for PaddlePaddle and PaddleLite.
 import os
 import numpy as np
 
-
 # from termcolor import colorize
 
 class Predictor:
     """ base class for Predictor interface"""
-
     def load(self, j):
         """ load model """
         pass
@@ -26,10 +24,8 @@ class Predictor:
         """ do inference """
         pass
 
-
 class PaddlePaddlePredictor(Predictor):
     """ PaddlePaddle interface wrapper """
-
     def __init__(self):
         import paddle as pd
         import paddle.fluid as fluid
@@ -52,7 +48,7 @@ class PaddlePaddlePredictor(Predictor):
         else:
             print("not combined")
             [program, feed, fetch] = fluid.io.load_inference_model(model_dir, self.exe)
-
+        
         self.program = program
         self.feed = feed
         self.fetch = fetch
@@ -68,7 +64,7 @@ class PaddlePaddlePredictor(Predictor):
             feeds[self.feed[index]] = self.inputs[index]
 
         self.results = self.exe.run(program=self.program,
-                                    feed=feeds, fetch_list=self.fetch, return_numpy=False)
+            feed=feeds, fetch_list=self.fetch, return_numpy=False)
 
         self.outputs = []
         for res in self.results:
@@ -78,10 +74,8 @@ class PaddlePaddlePredictor(Predictor):
     def get_output(self, index):
         return self.results[index]
 
-
 class PaddleLitePredictor(Predictor):
     """ PaddlePaddle interface wrapper """
-
     def __init__(self):
         self.predictor = None
 
@@ -116,3 +110,4 @@ class PaddleLitePredictor(Predictor):
 
     def get_output(self, index):
         return self.predictor.get_output(index)
+

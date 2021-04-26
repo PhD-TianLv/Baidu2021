@@ -3,7 +3,7 @@ import threading
 # 若不连接 WOBOT 控制器，则注释以下内容
 from serial_port import serial_connection
 from widgets import Light, Servo, Motor_rotate
-from cart import Cart
+from old_cart import Cart
 
 serial = serial_connection
 
@@ -100,9 +100,8 @@ def test_sign():
 def test_cart():
     cart = Cart()
     while True:
-        cart.steer(speed=50, angle=1)
-        # cart.move([-50, 50, -50, 50])
-        # cart.move([0, 0, 0, 50])
+        cart.steer(angle=-2)
+        # cart.move([80, 80, 80, 80])
 
 
 def test_thread():
@@ -167,6 +166,6 @@ if __name__ == '__main__':
     # test_motor(1)
     # test_joystick()
     # test_cam_cruiseModel()
-    test_cart()
+    # test_cart()
     # test_img_cruiseModel()
-    # test_joystick_run()
+    test_joystick_run()
