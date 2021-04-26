@@ -1,23 +1,19 @@
-import threading
-
 # 若不连接 WOBOT 控制器，则注释以下内容
 from serial_port import serial_connection
 from widgets import Light, Servo, Motor_rotate
 from old_cart import Cart
 
 serial = serial_connection
-
 from joystick import JoyStick
 from cruiser import Cruiser
 from camera import Camera
-
 from config import front_cam
-
 import cv2
 import time
+import threading
 
 
-def Lightwork(light_port, color):
+def test_light(light_port, color):
     light = Light(light_port)
     red = [80, 0, 0]
     green = [0, 80, 0]
@@ -33,11 +29,6 @@ def Lightwork(light_port, color):
     elif color == 'off':
         light_color = off
     light.lightcontrol(0, light_color[0], light_color[1], light_color[2])
-
-
-def test_light():
-    # TODO
-    pass
 
 
 def test_motor(port=1):
@@ -168,4 +159,5 @@ if __name__ == '__main__':
     # test_cam_cruiseModel()
     # test_cart()
     # test_img_cruiseModel()
-    test_joystick_run()
+    # test_joystick_run()
+    pass

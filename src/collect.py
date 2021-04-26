@@ -24,7 +24,6 @@ class Logger:
         self.map = {}
         self.result_dir = "train/"
 
-        self.camera.start()
         if not os.path.exists(self.result_dir):
             os.makedirs(self.result_dir)
 

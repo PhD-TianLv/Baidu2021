@@ -30,21 +30,21 @@ sign_list = {
 	4: "soldier",
 	5: "target"
 }
-# cruise model
+# cruise models
 cruise = {
-	"model":model_prefix + "models/cruise"
+	"models":model_prefix + "models/cruise"
 }
 # sign models
 sign = {
-	"model": model_prefix + "models/sign",
+	"models": model_prefix + "models/sign",
 	"threshold": 0.3,
 	"label_list": sign_list,
 	# label = 0 is background
 	"class_num": 10
 }
-# task model
+# task models
 task = {
-	"model":model_prefix + "models/task",
+	"models":model_prefix + "models/task",
 	"threshold":0.6,
 	"label_list":mission_label_list
 }

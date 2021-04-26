@@ -17,6 +17,8 @@ class Camera:
         for _ in range(10):  #warm up the camera
             (self.grabbed, self.frame) = self.stream.read()
 
+        self.start()
+
     def start(self):
         threading.Thread(target=self.update, args=()).start()
 

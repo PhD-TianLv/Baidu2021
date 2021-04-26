@@ -39,7 +39,7 @@ class Classifier:
     def __init__(self, args):
         self.args = args;
         self.predictor = predictor_wrapper.PaddleLitePredictor()
-        self.predictor.load(args["model"])
+        self.predictor.load(args["models"])
         self.label_list = args["label_list"];
         hwc_shape = list(args["shape"])
         hwc_shape[3], hwc_shape[1] = hwc_shape[1], hwc_shape[3]

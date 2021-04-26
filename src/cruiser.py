@@ -8,7 +8,7 @@ cnn_args = {
     "ms": [125.5, 0.00392157]
 }
 
-cruise_model = config.cruise["model"]
+cruise_model = config.cruise["models"]
 
 
 # CNN网络的图片预处理
@@ -56,6 +56,20 @@ class Cruiser:
         res = infer_cnn(self.predictor, self.buf, frame);
         # print(res)
         return res;
+
+
+class EvaCruiser(Cruiser):
+    def __init__(self):
+        hwc_shape = list(cnn_args["shape"])
+        hwc_shape[3], hwc_shape[1] = hwc_shape[1], hwc_shape[3]
+        self.buf = np.zeros(hwc_shape).astype('float32')
+        self.predictor = predictor_wrapper.PaddlePaddlePredictor()
+        cruise_model = 'models/cruise'
+        self.predictor.load(cruise_model)
+
+    def cruise(self, frame):
+        res = infer_cnn(self.predictor, self.buf, frame)
+        return res
 
 
 if __name__ == "__main__":

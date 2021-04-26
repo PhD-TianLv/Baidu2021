@@ -124,7 +124,7 @@ def res_to_detection(item, label_list, frame):
 class SignDetector:
     def __init__(self):
         self.predictor = predictor_wrapper.PaddleLitePredictor()
-        self.predictor.load(config.sign["model"])
+        self.predictor.load(config.sign["models"])
         self.label_list = config.sign["label_list"]
         self.class_num = config.sign["class_num"]
 
@@ -166,7 +166,7 @@ class SignDetector:
 class TaskDetector:
     def __init__(self):
         self.predictor = predictor_wrapper.PaddleLitePredictor()
-        self.predictor.load(config.task["model"])
+        self.predictor.load(config.task["models"])
         self.label_list = config.task["label_list"]
 
     # only one gt for one label
