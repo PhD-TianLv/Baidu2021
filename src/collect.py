@@ -7,7 +7,7 @@
 
 from joystick import JoyStick
 from cart import Cart
-import time
+from camera import Camera
 import cv2
 from threading import Thread, Lock
 import json
@@ -18,11 +18,13 @@ import os
 class Logger:
 
     def __init__(self):
-        self.camera = cv2.VideoCapture(config.front_cam)
+        self.camera = Camera()
         self.started = False
         self.counter = 0
         self.map = {}
-        self.result_dir = "../train/"
+        self.result_dir = "train/"
+
+        self.camera.start()
         if not os.path.exists(self.result_dir):
             os.makedirs(self.result_dir)
 
@@ -52,7 +54,7 @@ class Logger:
     def log(self, lock):
         if self.counter % 100 == 0:
             print('logging, count = {}'.format(self.counter))
-        return_value, image = self.camera.read()
+        image = self.camera.read()
         path = os.path.join(self.result_dir, '{}.jpg'.format(self.counter))
 
         lock.acquire()
