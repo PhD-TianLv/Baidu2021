@@ -28,16 +28,15 @@ class Logger:
             os.makedirs(self.result_dir)
 
     def start(self, lock):
-        lock.acquire()
         self.started = True
-        lock.release()
 
     def pause(self, lock):
         # 暂停，同时保存 angle 数据文件
+        self.started = False
+
         path = os.path.join(self.result_dir, 'result.json')
 
         lock.acquire()
-        self.started = False
         with open(path, 'w') as fp:
             json.dump(self.map.copy(), fp)
         lock.release()
@@ -57,14 +56,15 @@ class Logger:
         path = os.path.join(self.result_dir, '{}.jpg'.format(self.counter))
 
         lock.acquire()
-        # 将记录 axis 改为记录 cart.angle 并归一化
-        self.map[self.counter] = cart.angle / 4
-        cv2.imwrite(path, image)
-        self.counter = self.counter + 1
+        if self.started:
+            # 将记录 axis 改为记录 cart.angle 并归一化
+            self.map[self.counter] = cart.angle
+            cv2.imwrite(path, image)
+            self.counter = self.counter + 1
         lock.release()
 
 
-def JsRunThread(run_flag, js, cart, logger):
+def JsRunThread(run_flag, js, cart, logger, lock):
     while run_flag:
         # Run
         cart.steer(cart.speed, cart.angle)
@@ -72,17 +72,17 @@ def JsRunThread(run_flag, js, cart, logger):
         # JoystickContorl
         time, value, type_, number = js.read()
         # Key = X | log started | angle = 0
-        if 'X' in js.get_key():
+        if type_ == 1 and number == 3 and value == 1:
             cart.speed = cart.velocity
             cart.angle = 0
-            logger.start()
             print('Key[X] down, log started, run at {}, angle = {:.1f}'.format(cart.speed, cart.angle))
+            logger.start(lock)
 
         # Key = B | cart stopped | log paused | keep the value of angle
-        if 'B' in js.get_key():
+        if type_ == 1 and number == 1 and value == 1:
             cart.speed = 0
-            logger.pause()
             print('Key[B] down, log paused, car stopped')
+            logger.pause(lock)
 
         # Key = Y | angle = 0
         # if type_ == 1 and number == 4 and value == 1:
@@ -90,7 +90,7 @@ def JsRunThread(run_flag, js, cart, logger):
         #     print('Key[Y] down, angle = 0')
 
         # Key = LEFT | angle -= cart.angle_changeValue
-        if 'LEFT' in js.get_key():
+        if type_ == 2 and number == 6 and value == -32767:
             if cart.angle == cart.min_angle:
                 print('Key[LEFT] down, angle == {:.1f}, maximizing'.format(cart.min_angle))
             else:
@@ -98,7 +98,7 @@ def JsRunThread(run_flag, js, cart, logger):
                 print('Key[LEFT] down, angle -= {:.1f}, now angle = {:.1f}'.format(cart.change_in_angle, cart.angle))
 
         # Key = RIGHT | angle += cart.angle_changeValue
-        if 'RIGHT' in js.get_key():
+        if type_ == 2 and number == 6 and value == 32767:
             if cart.angle == cart.max_angle:
                 print('Key[RIGHT] down, angle == {:.1f}, maximizing'.format(cart.max_angle))
             else:
@@ -122,7 +122,7 @@ if __name__ == "__main__":
     # param set
     cart.velocity = 50
 
-    js_run_thread = Thread(target=JsRunThread, args=(run_flag, js, cart, logger))
+    js_run_thread = Thread(target=JsRunThread, args=(run_flag, js, cart, logger, lock))
     log_thread = Thread(target=LogThread, args=(run_flag, logger, lock))
     js_run_thread.start()
     log_thread.start()

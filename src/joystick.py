@@ -92,19 +92,19 @@ class JoyStick:
         if type_ == 1 and number == 1 and value == 1:
             keys.append('B')
         if type_ == 1 and number == 3 and value == 1:
-            keys.apppend('X')
+            keys.append('X')
         if type_ == 1 and number == 4 and value == 1:
-            keys.apppend('Y')
+            keys.append('Y')
         if type_ == 2 and number == 6 and value == -32767:
-            keys.apppend('LEFT')
+            keys.append('LEFT')
         if type_ == 2 and number == 6 and value == 32767:
-            keys.apppend('RIGHT')
+            keys.append('RIGHT')
         if type_ == 2 and number == 7 and value == -32767:
-            keys.apppend('UP')
+            keys.append('UP')
         if type_ == 2 and number == 7 and value == 32767:
-            keys.apppend('DOWN')
+            keys.append('DOWN')
         if type_ == 1 and number == 6 and value == 1:
-            keys.apppend('L1')
+            keys.append('L1')
         if type_ == 1 and number == 7 and value == 1:
-            keys.apppend('R1')
+            keys.append('R1')
         return keys
