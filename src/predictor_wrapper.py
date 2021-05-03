@@ -11,7 +11,7 @@ class Predictor:
     """ base class for Predictor interface"""
 
     def load(self, j):
-        """ load models """
+        """ load model """
         pass
 
     def set_input(self, data, index):
@@ -40,8 +40,8 @@ class PaddlePaddlePredictor(Predictor):
 
     def load(self, model_dir):
         import paddle.fluid as fluid
-        # model_dir = j["models"]
-        # print(colorize('Loading models: {}'.format(model_dir), fg='green'))
+        # model_dir = j["model"]
+        # print(colorize('Loading model: {}'.format(model_dir), fg='green'))
         program = None
         feed = None
         fetch = None
@@ -99,7 +99,7 @@ class PaddleLitePredictor(Predictor):
         )
         config = CxxConfig()
         if os.path.exists(model_dir + "/params"):
-            config.set_model_file(model_dir + "/models")
+            config.set_model_file(model_dir + "/model")
             config.set_param_file(model_dir + "/params")
         else:
             config.set_model_dir(model_dir)

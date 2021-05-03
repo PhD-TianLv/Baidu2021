@@ -14,9 +14,9 @@ if __name__ == '__main__':
 
     while True:
         front_image = front_camera.read()
-        angle = cruiser.cruise(front_image)
+        angle = cruiser.cruise(front_image) * 4
         print('angle = {}'.format(angle))  # DEBUG
-        # cart.steer(cart.speed, angle)
+        cart.steer(cart.speed, angle)
 
 
 

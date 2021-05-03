@@ -1,6 +1,6 @@
 # 若不连接 WOBOT 控制器，则注释以下内容
 from serial_port import serial_connection
-from widgets import Light, Servo, Motor_rotate
+from widgets import Light, Servo, Motor_rotate, Buzzer
 from old_cart import Cart
 
 serial = serial_connection
@@ -31,10 +31,13 @@ def test_light(light_port, color):
     light.lightcontrol(0, light_color[0], light_color[1], light_color[2])
 
 
-def test_motor(port=1):
-    motor = Motor_rotate(port)
+def test_motor(port=1, speed=50):
+    ports = list(port)
+    for port in ports:
+        exec('motor_{} = Motor_rotate({})'.format(port, port))
     while True:
-        motor.motor_rotate(50)
+        for port in ports:
+            exec('motor_{}.motor_rotate({})'.format(port, speed))
 
 
 def test_servo(ID=1):
@@ -78,7 +81,6 @@ def test_cam_cruiseModel():
 
 
 def test_sign():
-    # TODO: Complete the task
     cruiser = Cruiser()
     front_camera = Camera(front_cam, [640, 480])
     front_camera.start()
@@ -153,11 +155,17 @@ def test_joystick_run():
     cart.stop()
 
 
+def test_buzzer():
+    buzzer = Buzzer()
+    buzzer.rings()
+
+
 if __name__ == '__main__':
-    # test_motor(1)
+    # test_motor(port=[1, 2, 3, 4], speed=50)
     # test_joystick()
     # test_cam_cruiseModel()
     # test_cart()
     # test_img_cruiseModel()
     # test_joystick_run()
+    test_buzzer()
     pass

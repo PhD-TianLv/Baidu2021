@@ -33,7 +33,7 @@ class JoyStick:
         type_: 2
         number: 7
     Key[DOWN]:
-        value[key_down]: 32767 | value[key_up]: 0
+        value[key_down]: 0 | value[key_up]: 0
         type_: 2
         number: 7
     Key[L1]:
@@ -80,31 +80,14 @@ class JoyStick:
             fvalue = value / 32767
             return fvalue
 
-    def get_key(self) -> list:
-        """
-        获取所有已按下的按键列表
-        :return: 所有已按下按键的列表
-        """
-        time, value, type_, number = self.read()
-        keys = []
-        if type_ == 1 and number == 0 and value == 1:
-            keys.append('A')
-        if type_ == 1 and number == 1 and value == 1:
-            keys.append('B')
-        if type_ == 1 and number == 3 and value == 1:
-            keys.append('X')
-        if type_ == 1 and number == 4 and value == 1:
-            keys.append('Y')
-        if type_ == 2 and number == 6 and value == -32767:
-            keys.append('LEFT')
-        if type_ == 2 and number == 6 and value == 32767:
-            keys.append('RIGHT')
-        if type_ == 2 and number == 7 and value == -32767:
-            keys.append('UP')
-        if type_ == 2 and number == 7 and value == 32767:
-            keys.append('DOWN')
-        if type_ == 1 and number == 6 and value == 1:
-            keys.append('L1')
-        if type_ == 1 and number == 7 and value == 1:
-            keys.append('R1')
-        return keys
+
+if __name__ == '__main__':
+    js = JoyStick()
+
+    while True:
+        time, value, type_, number = js.read()
+        print('-' * 32)
+        print('time = {}'.format(time))
+        print('value = {}'.format(value))
+        print('type_ = {}'.format(type_))
+        print('number = {}'.format(number))

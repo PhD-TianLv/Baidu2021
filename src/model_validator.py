@@ -140,11 +140,11 @@ def create_predictor():
 def main():
     cnn_predictor = create_predictor()
     print(cnn_predictor)
-    # cnn_predictor.load("models/w1")
+    # cnn_predictor.load("model/w1")
     yolo_predictor = create_predictor()
     print(yolo_predictor)
-    # yolo_predictor.load("models/task")
-    yolo_predictor.load("models/sign_fuse")
+    # yolo_predictor.load("model/task")
+    yolo_predictor.load("model/sign_fuse")
     # sign_fuse
 
 

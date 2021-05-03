@@ -1,11 +1,12 @@
+from logging import exception
+
 import cv2
 import threading
-import time
+import numpy as np
 
 
 class Camera:
     def __init__(self, src=0, shape=[480, 320]):
-        self.src = src
         self.stream = cv2.VideoCapture(src)
         # self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, shape[0])
         # self.stream.set(cv2.CAP_PROP_FRAME_HEIGHT, shape[1])

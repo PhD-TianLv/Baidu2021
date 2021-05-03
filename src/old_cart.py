@@ -35,7 +35,6 @@ class Cart:
         # angle = angle * 0.9;
         # angle = angle * self.Kx
 
-        # TODO: 检查 angle = 0 时是否有问题
         # leftwheel = speed + 1
         # rightwheel = speed - 2
         leftwheel = speed

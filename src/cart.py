@@ -1,15 +1,12 @@
-from serial_port import serial_connection
-
-from ctypes import *
-import time
 import serial
-import math
+from ctypes import *
 
 comma_head_01_motor = bytes.fromhex('77 68 06 00 02 0C 02 01')
 comma_head_02_motor = bytes.fromhex('77 68 06 00 02 0C 02 02')
 comma_head_03_motor = bytes.fromhex('77 68 06 00 02 0C 02 03')
 comma_head_04_motor = bytes.fromhex('77 68 06 00 02 0C 02 04')
 comma_trail = bytes.fromhex('0A')
+from serial_port import serial_connection
 
 
 class Cart:
@@ -19,8 +16,10 @@ class Cart:
         portx = "/dev/ttyUSB0"
         bps = 115200
         self.serial = serial.Serial(portx, int(bps), timeout=1, parity=serial.PARITY_NONE, stopbits=1)
-        self.min_angle = -2.0
-        self.max_angle = 2.0
+        self.maxSpeed = 100
+        self.minAngle = -2.0
+        self.maxAngle = 2.0
+        self.changeInAngle = 0.2
 
     def steer(self, speed, angle):
         speed = int(speed) if speed else int(self.speed)
@@ -39,6 +38,8 @@ class Cart:
 
     def stop(self):
         self.move([0, 0, 0, 0])
+        self.speed = 0
+        self.angle = 0
 
     def exchange(self, speed):
         if speed > 100:
@@ -64,6 +65,7 @@ class Cart:
         send_data_02_motor = comma_head_02_motor + right_front.to_bytes(1, byteorder='big', signed=True) + comma_trail
         send_data_03_motor = comma_head_03_motor + left_rear.to_bytes(1, byteorder='big', signed=True) + comma_trail
         send_data_04_motor = comma_head_04_motor + right_rear.to_bytes(1, byteorder='big', signed=True) + comma_trail
+        # print(send_data_01_motor)  # DEBUG
 
         self.serial.write(send_data_01_motor)
         self.serial.write(send_data_02_motor)
@@ -86,3 +88,9 @@ class Cart:
     def reverse(self):
         speed = self.speed
         self.move([-speed, -speed, -speed, -speed])
+
+
+if __name__ == '__main__':
+    cart = Cart()
+    while True:
+        cart.move([50, 100, 100, 100])

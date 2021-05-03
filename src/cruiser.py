@@ -18,7 +18,7 @@ def process_image(frame, size, ms):
     img = img - ms[0]
     img = img * ms[1]
     img = np.expand_dims(img, axis=0)
-    return img;
+    return img
 
 
 # CNN网络预处理
@@ -64,7 +64,7 @@ class EvaCruiser(Cruiser):
         hwc_shape[3], hwc_shape[1] = hwc_shape[1], hwc_shape[3]
         self.buf = np.zeros(hwc_shape).astype('float32')
         self.predictor = predictor_wrapper.PaddlePaddlePredictor()
-        cruise_model = 'models/cruise'
+        cruise_model = 'model/cruise'
         self.predictor.load(cruise_model)
 
     def cruise(self, frame):
@@ -75,4 +75,4 @@ class EvaCruiser(Cruiser):
 if __name__ == "__main__":
     c = Cruiser()
     test_image = cv2.imread('test/cruise/7.png')
-    print(c.cruise(test_image))
+    print(c.cruise(test_image) * 4)
