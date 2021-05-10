@@ -17,13 +17,17 @@ class Button:
     def clicked(self):
         serial.write(self.cmd_data)
         response = serial.read()
+        # print(len(response))
 
         buttonclick = "no"
         if len(response) == 9 and response[5] == 0xE1 and response[6] == self.port:
             button_byte = response[3:5] + bytes.fromhex('00 00')
             button_value = struct.unpack('<i', struct.pack('4B', *(button_byte)))[0]
+            # print(button_value)
             # print("%x"%button_value)
-            if button_value >= 0x1f1 and button_value <= 0x1ff:
+            if button_value in [0x1fc, 0x1fd]:
+                buttonclick = "RIGHT"
+            elif button_value >= 0x1f1 and button_value <= 0x1ff:
                 buttonclick = "UP"
             elif button_value >= 0x330 and button_value <= 0x33f:
                 buttonclick = "LEFT"
@@ -31,6 +35,7 @@ class Button:
                 buttonclick = "DOWN"
             elif button_value >= 0x2a0 and button_value <= 0x2af:
                 buttonclick = "RIGHT"
+                # print('ok')
             else:
                 buttonclick
         return self.buttonstr == buttonclick
@@ -93,7 +98,8 @@ class UltrasonicSensor():
         return_data_ultrasonic = return_data[3:7]
         ultrasonic_sensor = struct.unpack('<f', struct.pack('4B', *(return_data_ultrasonic)))[0]
         # print(ultrasonic_sensor)
-        return int(ultrasonic_sensor)
+        return ultrasonic_sensor  #DEBUG
+        # return int(ultrasonic_sensor)
 
 
 class Servo:
@@ -117,10 +123,10 @@ class Servo_pwm:
         self.ID_str = '{:02x}'.format(ID)
 
     def servocontrol(self, angle, speed):
-        cmd_servo_data = bytes.fromhex('77 68 06 00 02 0B') + bytes.fromhex(self.ID_str) + speed.to_bytes(1,
-                                                                                                          byteorder='big', \
-                                                                                                          signed=True) + angle.to_bytes(
-            1, byteorder='big', signed=False) + bytes.fromhex('0A')
+        cmd_servo_data = bytes.fromhex('77 68 06 00 02 0B') + bytes.fromhex(self.ID_str) \
+                         + speed.to_bytes(1, byteorder='big', signed=True) + angle.to_bytes(1, byteorder='big',
+                                                                                            signed=False) \
+                         + bytes.fromhex('0A')
         # for i in range(0,2):
         serial.write(cmd_servo_data)
         # time.sleep(0.3)

@@ -21,6 +21,7 @@ yolo_args = {
     "shape": [1, 3, 300, 300]
 }
 
+
 def draw_boxes(img, valid_results):
     """ draw SSD boxes on image"""
     res = list(img.shape)
@@ -58,7 +59,8 @@ def dataset(frame, size):
     img = img / 255.0
     img = np.expand_dims(img, axis=0)
     print("image_shape:", img.shape)
-    return img;
+    return img
+
 
 def preprocess(args, img):
     """ preprocess image using formula y = (x - mean) x scale """
@@ -77,6 +79,7 @@ def preprocess(args, img):
     data = data.reshape(shape)
     return data
 
+
 def yolo_preprocess(args, src):
     shape = args["shape"]
     img = cv2.resize(src, (shape[3], shape[2]))
@@ -87,8 +90,9 @@ def yolo_preprocess(args, src):
 
     z = np.zeros((1, shape[2], shape[3], 3)).astype(np.float32)
     z[0, 0:img.shape[0], 0:img.shape[1] + 0, 0:img.shape[2]] = img
-    z = z.reshape(1, 3, shape[3], shape[2]);
-    return z;
+    z = z.reshape(1, 3, shape[3], shape[2])
+    return z
+
 
 def infer_cnn(predictor, image):
     data = preprocess(cnn_args, image)
@@ -96,6 +100,7 @@ def infer_cnn(predictor, image):
     predictor.run()
     out = predictor.get_output(0)
     print(out.data())
+
 
 def infer_tiny_yolo(predictor, image):
     a = datetime.datetime.now()
@@ -114,14 +119,14 @@ def infer_tiny_yolo(predictor, image):
     dims = np.array([image.shape[0], image.shape[1]]).astype("int32")
     dims = dims.reshape([1, 2])
     predictor.set_input(dims, 1)
-    
+
     predictor.run()
     a = datetime.datetime.now()
 
     times = 100
     for i in range(times):
         predictor.run()
-    
+
     b = datetime.datetime.now()
     c = b - a
     mill = c.microseconds / 1000.0;
@@ -131,11 +136,13 @@ def infer_tiny_yolo(predictor, image):
     print(np.array(out))
     draw_boxes(image, np.array(out))
 
+
 def create_predictor():
     if engine == "PaddlePaddle":
         return predictor_wrapper.PaddlePaddlePredictor()
     else:
         return predictor_wrapper.PaddleLitePredictor()
+
 
 def main():
     cnn_predictor = create_predictor()
@@ -147,11 +154,11 @@ def main():
     yolo_predictor.load("model/sign_fuse")
     # sign_fuse
 
-
     image_path = "0.png"
 
     img = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
     # infer_cnn(cnn_predictor, img)
     infer_tiny_yolo(yolo_predictor, img)
+
 
 main()

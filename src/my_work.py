@@ -1,11 +1,11 @@
 # 若不连接 WOBOT 控制器，则注释以下内容
+#%%
 from serial_port import serial_connection
-from widgets import Light, Servo, Motor_rotate, Buzzer
-from old_cart import Cart
+from widgets import Light, Servo, Motor_rotate, Buzzer, Servo_pwm, UltrasonicSensor, Button
+from cart import Cart
 
 serial = serial_connection
 from joystick import JoyStick
-from cruiser import Cruiser
 from camera import Camera
 from config import front_cam
 import cv2
@@ -93,7 +93,12 @@ def test_sign():
 def test_cart():
     cart = Cart()
     while True:
-        cart.steer(angle=-2)
+        # cart.steer(angle=-2)
+        # time.sleep(1)
+        cart.move([40, 40, 40, 40])
+        time.sleep(1)
+        cart.move([0, 0, 0, 0])
+        time.sleep(1)
         # cart.move([80, 80, 80, 80])
 
 
@@ -160,6 +165,27 @@ def test_buzzer():
     buzzer.rings()
 
 
+def test_servo_pwm():
+    #%%
+    servo_pwm = Servo_pwm(2)
+    servo_pwm.servocontrol(30, 10)
+
+
+def test_ultrasonicSensor():
+    ultra = UltrasonicSensor(1)
+    while True:
+        print(ultra.read())
+
+
+def test_button():
+    button = Button(1, 'RIGHT')
+    ultra = UltrasonicSensor(2)
+    while True:
+        if button.clicked():
+            print(ultra.read())
+
+
+#%%
 if __name__ == '__main__':
     # test_motor(port=[1, 2, 3, 4], speed=50)
     # test_joystick()
@@ -167,5 +193,8 @@ if __name__ == '__main__':
     # test_cart()
     # test_img_cruiseModel()
     # test_joystick_run()
-    test_buzzer()
+    # test_buzzer()
+    # test_servo_pwm()
+    # test_ultrasonicSensor()
+    test_button()
     pass

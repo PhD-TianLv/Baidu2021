@@ -1,5 +1,6 @@
 import serial
 from ctypes import *
+import settings
 
 comma_head_01_motor = bytes.fromhex('77 68 06 00 02 0C 02 01')
 comma_head_02_motor = bytes.fromhex('77 68 06 00 02 0C 02 02')
@@ -19,7 +20,7 @@ class Cart:
         self.maxSpeed = 100
         self.minAngle = -2.0
         self.maxAngle = 2.0
-        self.changeInAngle = 0.2
+        self.changeInAngle = settings.changeInAngle
 
     def steer(self, speed, angle):
         speed = int(speed) if speed else int(self.speed)

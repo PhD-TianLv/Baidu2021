@@ -8,7 +8,7 @@ cnn_args = {
     "ms": [125.5, 0.00392157]
 }
 
-cruise_model = config.cruise["models"]
+cruise_model = config.cruise["model"]
 
 
 # CNN网络的图片预处理
@@ -24,7 +24,7 @@ def process_image(frame, size, ms):
 # CNN网络预处理
 def cnn_preprocess(args, img, buf):
     shape = args["shape"]
-    img = process_image(img, shape[2], args["ms"]);
+    img = process_image(img, shape[2], args["ms"])
     hwc_shape = list(shape)
     hwc_shape[3], hwc_shape[1] = hwc_shape[1], hwc_shape[3]
     data = buf
@@ -55,7 +55,7 @@ class Cruiser:
     def cruise(self, frame):
         res = infer_cnn(self.predictor, self.buf, frame);
         # print(res)
-        return res;
+        return res
 
 
 class EvaCruiser(Cruiser):
@@ -64,7 +64,7 @@ class EvaCruiser(Cruiser):
         hwc_shape[3], hwc_shape[1] = hwc_shape[1], hwc_shape[3]
         self.buf = np.zeros(hwc_shape).astype('float32')
         self.predictor = predictor_wrapper.PaddlePaddlePredictor()
-        cruise_model = 'model/cruise'
+        cruise_model = 'models/cruise'
         self.predictor.load(cruise_model)
 
     def cruise(self, frame):
@@ -74,5 +74,10 @@ class EvaCruiser(Cruiser):
 
 if __name__ == "__main__":
     c = Cruiser()
-    test_image = cv2.imread('test/cruise/7.png')
-    print(c.cruise(test_image) * 4)
+    test_image = c
+    cv2.imread('480.jpg')
+    print(c.cruise(test_image))
+
+    # c = EvaCruiser()
+    # img = cv2.imread('480.jpg')
+    # print(c.cruise(img))

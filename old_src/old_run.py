@@ -8,7 +8,7 @@ import config
 from widgets import Button
 from camera import Camera
 from cruiser import Cruiser
-from old_cart import Cart
+from oldcart import Cart
 from config import front_cam
 from driver import Driver
 
@@ -28,7 +28,6 @@ def check_stop():
         return True
     return False
 
-'''
 if __name__ == '__main__':
     front_camera.start()
     #基准速度
