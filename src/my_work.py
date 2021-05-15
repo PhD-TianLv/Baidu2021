@@ -168,7 +168,9 @@ def test_buzzer():
 def test_servo_pwm():
     #%%
     servo_pwm = Servo_pwm(2)
-    servo_pwm.servocontrol(30, 10)
+    while True:
+        servo_pwm.servocontrol(0, 30)
+        servo_pwm.servocontrol(255, 30)
 
 
 def test_ultrasonicSensor():
@@ -185,7 +187,8 @@ def test_button():
             print(ultra.read())
 
 
-#%%
+
+
 if __name__ == '__main__':
     # test_motor(port=[1, 2, 3, 4], speed=50)
     # test_joystick()
@@ -194,7 +197,7 @@ if __name__ == '__main__':
     # test_img_cruiseModel()
     # test_joystick_run()
     # test_buzzer()
-    # test_servo_pwm()
+    test_servo_pwm()
     # test_ultrasonicSensor()
-    test_button()
+    # test_button()
     pass

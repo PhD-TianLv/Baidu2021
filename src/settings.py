@@ -2,8 +2,8 @@ import os
 import sys
 
 # 车辆运行速度
-velocity = 40
-# velocity = 25
+# velocity = 40
+velocity = 25
 
 # collect.py 中数据的存储目录
 resultDir = "train/"

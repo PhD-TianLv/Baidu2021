@@ -23,10 +23,12 @@ class Button:
         if len(response) == 9 and response[5] == 0xE1 and response[6] == self.port:
             button_byte = response[3:5] + bytes.fromhex('00 00')
             button_value = struct.unpack('<i', struct.pack('4B', *(button_byte)))[0]
-            # print(button_value)
-            # print("%x"%button_value)
-            if button_value in [0x1fc, 0x1fd]:
+            # print(button_value) # DEBUG
+            # print("%x" % button_value) # DEBUG
+            if button_value in [0x1fe, 0x1ff]:
                 buttonclick = "RIGHT"
+            elif button_value in [767, 768]:
+                buttonclick = "LEFT"
             elif button_value >= 0x1f1 and button_value <= 0x1ff:
                 buttonclick = "UP"
             elif button_value >= 0x330 and button_value <= 0x33f:
@@ -124,8 +126,8 @@ class Servo_pwm:
 
     def servocontrol(self, angle, speed):
         cmd_servo_data = bytes.fromhex('77 68 06 00 02 0B') + bytes.fromhex(self.ID_str) \
-                         + speed.to_bytes(1, byteorder='big', signed=True) + angle.to_bytes(1, byteorder='big',
-                                                                                            signed=False) \
+                         + speed.to_bytes(1, byteorder='big', signed=True)\
+                         + angle.to_bytes(1, byteorder='big', signed=False) \
                          + bytes.fromhex('0A')
         # for i in range(0,2):
         serial.write(cmd_servo_data)
