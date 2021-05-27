@@ -41,6 +41,6 @@ def merge_json(json_path='../data/json/', output_path='../data/result.json'):
 
 
 if __name__ == '__main__':
-    json_path = '../data/json/'
-    output_path = '../data/result.json'
+    json_path = '../../data/json/'
+    output_path = '../data/json/result.json'
     merge_json(json_path, output_path)

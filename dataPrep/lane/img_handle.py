@@ -1,12 +1,16 @@
 import os
-import numpy as np
-import cv2 as cv
+import shutil
 import re
+import cv2 as cv
+import numpy as np
 
-os.chdir('D:\\WorkSpace\\Baidu2021')
+os.chdir('/')
 
 
 def img_extract(img_path, save_path):
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+
     img_name = os.listdir(img_path)
     img_name.remove('result.json')
     lower_hsv = np.array([20, 75, 165])
@@ -21,8 +25,11 @@ def img_extract(img_path, save_path):
         new_name = str(ind) + '.jpg'
         cv.imwrite(os.path.join(save_path, new_name), mask)
 
+    shutil.copy(os.path.join(img_path, 'result.json'), save_path)
+
 
 if __name__ == '__main__':
-    img_path = 'data/train_2'
-    save_path = 'data/train_2_hsv'
+    img_path = 'data/train4'
+    save_path = 'data/train4_hsv'
     img_extract(img_path, save_path)
+    print('img_extract finished!')
