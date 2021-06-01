@@ -1,22 +1,22 @@
 import os
 import sys
 
+# -------global settings-------
 # 车辆运行速度
-# velocity = 40
-velocity = 25
+velocity = 40
 
-# collect.py 中数据的存储目录
+# 工作目录
+work_dir = '/home/root/workspace/Baidu2021'
+
+# -------collect.py-------
 resultDir = "train/"
-
 angleModelPath = 'models/cruiseModel'
-
-changeInAngle = 0.1
+changeInAngle = 0.3
+recordSideCam = False
 
 
 def set_working_dir():
-    work_dir = '/home/root/workspace/Baidu2021'
     print('work_dir = {}'.format(work_dir))
     sys.path.clear()
-
     sys.path.append(work_dir)
     os.chdir(work_dir)

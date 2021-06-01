@@ -187,17 +187,15 @@ def test_button():
             print(ultra.read())
 
 
-
-
 if __name__ == '__main__':
-    # test_motor(port=[1, 2, 3, 4], speed=50)
+    test_motor(port=[1, 2, 3, 4], speed=-20)
     # test_joystick()
     # test_cam_cruiseModel()
     # test_cart()
     # test_img_cruiseModel()
     # test_joystick_run()
     # test_buzzer()
-    test_servo_pwm()
+    # test_servo_pwm()
     # test_ultrasonicSensor()
     # test_button()
     pass
