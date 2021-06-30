@@ -7,10 +7,10 @@ from cart import Cart
 serial = serial_connection
 from joystick import JoyStick
 from camera import Camera
-from config import front_cam
 import cv2
 import time
 import threading
+import numpy as np
 
 
 def test_light(light_port, color):
@@ -166,11 +166,10 @@ def test_buzzer():
 
 
 def test_servo_pwm():
-    #%%
-    servo_pwm = Servo_pwm(2)
+    servo_pwm = Servo_pwm(5)
     while True:
-        servo_pwm.servocontrol(0, 30)
-        servo_pwm.servocontrol(255, 30)
+        servo_pwm.servocontrol(0, 100)
+        servo_pwm.servocontrol(120, 100)
 
 
 def test_ultrasonicSensor():
@@ -187,15 +186,94 @@ def test_button():
             print(ultra.read())
 
 
+def test_preprocess(src):
+    img = cv2.resize(src, (608, 608))
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img = img.astype(np.float32)
+    img /= 255
+    img -= [0.485, 0.456, 0.406]
+    img /= [0.229, 0.224, 0.225]
+
+    z = np.zeros((1, 608, 608, 3)).astype(np.float32)
+    z[0, 0:img.shape[0], 0:img.shape[1] + 0, 0:img.shape[2]] = img
+    z = z.reshape(1, 3, 608, 608)
+    return z
+
+
+def test_mark():
+    import settings
+    from marker import init_predictor, ssd_preprocess, infer_ssd, analyse_res
+
+    predictor = init_predictor(model_dir=settings.markModelPath)
+    img_path = 'test_imgs/changqiezi_191.jpg'
+    img = cv2.imread(img_path)
+
+    data = test_preprocess(img)
+    res = infer_ssd(predictor, img, data)
+    result = analyse_res(res, debug=True)
+    print('result = {}'.format(result))
+
+
+def test_work():
+    from marker import init_predictor, getResult
+    from threading import Thread
+    predictor = init_predictor(model_dir=settings.taskModelPath)
+    sideCamera = Camera(src=1)
+    sideServo = Servo(1)
+    sideServo.servocontrol(30, 50)  # 转到中心
+    time.sleep(2)
+
+    sideServo.servocontrol(-60, 25)
+
+    while True:
+        side_image = sideCamera.read()
+        result = getResult(side_image, predictor=predictor, mode='task')
+        if result:
+            print(result)
+
+
+def test_target():
+    from laser import Laser
+    laser_left = Laser(port=2)
+    laser_right = Laser(port=1)
+    cart = Cart()
+    cart.steer(8, 0)
+
+    while True:
+        dis_left, dis_right = float(laser_left.read()), float(laser_right.read())
+        str_dis_left = "%.2f" % dis_left
+        str_dis_right = "%.2f" % dis_right
+        print('dis_left={}, dis_right={}'.format(str_dis_left, str_dis_right))
+        if -1 in [dis_left, dis_right] or dis_left >= 0.5 or dis_right >= 0.5:
+            continue
+        if abs(dis_left - dis_right) <= 0.04:
+            cart.stop()
+            print('car stop')
+            break
+
+
+def test_run():
+    cart = Cart()
+    cart.steer(10, 0)
+
+
 if __name__ == '__main__':
-    test_motor(port=[1, 2, 3, 4], speed=-20)
+    import settings
+
+    # test_light(2, 'off')
+    # test_motor(port=[1, 2, 3, 4], speed=-20)
     # test_joystick()
     # test_cam_cruiseModel()
     # test_cart()
     # test_img_cruiseModel()
     # test_joystick_run()
     # test_buzzer()
+    # test_servo(1)
     # test_servo_pwm()
     # test_ultrasonicSensor()
     # test_button()
+    # test_mark()
+    # test_work()
+    test_target()
+    # test_run()
     pass

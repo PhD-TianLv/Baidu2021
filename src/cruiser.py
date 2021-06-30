@@ -3,12 +3,10 @@ import os
 import settings
 import cv2
 import numpy as np
-import sys
-sys.path.append(settings.work_dir)
 from paddlelite import Place, CxxConfig, CreatePaddlePredictor, TargetType, PrecisionType, DataLayoutType
 
 
-def img_deal(img):
+def img_process(img):
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
     # 正常的 HSV
@@ -44,7 +42,7 @@ def init_predictor():
     return predictor
 
 
-def angle_predict(img, predictor):
+def predict_angle(img, predictor):
     buf = np.zeros((1, 128, 128, 3)).astype(np.float32)
     buf[0, 0:128, 0:128, 0:3] = img
     buf = buf.reshape((1, 3, 128, 128))
@@ -59,6 +57,12 @@ def angle_predict(img, predictor):
     return score
 
 
+def getAngle(src, predictor):
+    img, mask = img_process(src)
+    angle = predict_angle(img, predictor)
+    return angle
+
+
 def test_cam():
     stream = cv2.VideoCapture(0)
     stream.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
@@ -68,11 +72,10 @@ def test_cam():
     while True:
         _, frame = stream.read()
         # print(frame)
-        img, mask = img_deal(frame)
-        angle = angle_predict(img, predictor)
+        img, mask = img_process(frame)
+        angle = predict_angle(img, predictor)
         print(angle)
 
 
 if __name__ == '__main__':
-    settings.set_working_dir()
     test_cam()

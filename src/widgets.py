@@ -105,7 +105,7 @@ class UltrasonicSensor():
 
 
 class Servo:
-    def __init__(self, ID):
+    def __init__(self, ID):  # left: angle=120, right: angle=-60, speed=50
         self.ID = ID
         self.ID_str = '{:02x}'.format(ID)
 
@@ -114,8 +114,8 @@ class Servo:
                          + bytes.fromhex(self.ID_str) \
                          + speed.to_bytes(1, byteorder='big', signed=True) \
                          + angle.to_bytes(1, byteorder='big', signed=True) + bytes.fromhex('0A')
-        # for i in range(0,2):
-        serial.write(cmd_servo_data)
+        for i in range(2):
+            serial.write(cmd_servo_data)
         #     time.sleep(0.3)
 
 
@@ -126,12 +126,17 @@ class Servo_pwm:
 
     def servocontrol(self, angle, speed):
         cmd_servo_data = bytes.fromhex('77 68 06 00 02 0B') + bytes.fromhex(self.ID_str) \
-                         + speed.to_bytes(1, byteorder='big', signed=True)\
-                         + angle.to_bytes(1, byteorder='big', signed=False) \
+                         + speed.to_bytes(1, byteorder='big', signed=True) \
+                         + angle.to_bytes(1, byteorder='big', signed=True) \
                          + bytes.fromhex('0A')
-        # for i in range(0,2):
         serial.write(cmd_servo_data)
         # time.sleep(0.3)
+
+    def up(self):
+        self.servocontrol(120, 100)
+
+    def down(self):
+        self.servocontrol(30, 100)
 
 
 class Light:
@@ -148,11 +153,16 @@ class Light:
                                                                                     , Green_str, Blue_str))
         serial.write(cmd_servo_data)
 
+    def lightgreen(self):
+        self.lightcontrol(self.port, 0, 80, 0)
+
     def lightoff(self):
-        cmd_servo_data1 = bytes.fromhex('77 68 08 00 02 3B 02 00 00 00 00 0A')
-        cmd_servo_data2 = bytes.fromhex('77 68 08 00 02 3B 03 00 00 00 00 0A')
-        cmd_servo_data = cmd_servo_data1 + cmd_servo_data2
-        serial.write(cmd_servo_data)
+        self.lightcontrol(0, 0, 0, 0)
+        # cmd_servo_data1 = bytes.fromhex('77 68 08 00 02 3B 02 00 00 00 00 0A')
+        # cmd_servo_data2 = bytes.fromhex('77 68 08 00 02 3B 03 00 00 00 00 0A')
+        # cmd_servo_data = cmd_servo_data1 + cmd_servo_data2
+        # for i in range(10):
+        #     serial.write(cmd_servo_data)
 
 
 #电机

@@ -7,7 +7,6 @@ comma_head_02_motor = bytes.fromhex('77 68 06 00 02 0C 02 02')
 comma_head_03_motor = bytes.fromhex('77 68 06 00 02 0C 02 03')
 comma_head_04_motor = bytes.fromhex('77 68 06 00 02 0C 02 04')
 comma_trail = bytes.fromhex('0A')
-from serial_port import serial_connection
 
 
 class Cart:
@@ -38,7 +37,8 @@ class Cart:
         self.move([leftwheel, rightwheel, leftwheel, rightwheel])
 
     def stop(self):
-        self.move([0, 0, 0, 0])
+        for i in range(2):
+            self.move([0, 0, 0, 0])
         self.speed = 0
         self.angle = 0
 
