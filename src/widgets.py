@@ -211,9 +211,9 @@ class ClipServo(Servo):
             time.sleep(0.4)
 
     def clamp(self):
-        self.servocontrol(-30, 70)
+        self.servocontrol(10, 70)
         time.sleep(1.5)
-        self.servocontrol(-20, 70)
+        self.servocontrol(0, 70)
         time.sleep(0.5)
 
     def loose(self):
@@ -238,13 +238,13 @@ class SoldierServo(Servo_pwm):
             time.sleep(0.1)
 
     def up(self):
-        self.servocontrol(50, 30)
+        self.servocontrol(40, 30)
         time.sleep(0.5)
-        self.servocontrol(45, 30)
+        self.servocontrol(35, 30)
         time.sleep(0.5)
 
     def down(self):
-        self.servocontrol(35, 30)
+        self.servocontrol(20, 30)
         time.sleep(0.5)
 
 
@@ -317,7 +317,7 @@ class SideMotor(Motor_rotate):
             time.sleep(0.01)
 
     def shrink(self):
-        self.motor_rotate(-70)
+        self.motor_rotate(-40)
         time.sleep(1.5)
         self.motor_rotate(0)
 

@@ -1,4 +1,4 @@
-from compass import Compass
+from compass_prepare import Compass
 from laser import Laser
 from laser_bool import LaserBool
 import settings

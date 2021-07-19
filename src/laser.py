@@ -127,4 +127,5 @@ if __name__ == '__main__':
     # print(laser2.read())
     while True:
         print(laser1.read(), laser2.read())
+        # print('laser2', laser2.read())
         pass

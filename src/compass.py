@@ -37,7 +37,17 @@ class Compass:
         self.serial = serial.Serial(portx,
                                     int(bps),
                                     bytesize=serial.EIGHTBITS,
-                                    timeout=0.001,  # 不许改动
+                                    timeout=0.01,  # 不许改动
+                                    parity=serial.PARITY_NONE,
+                                    stopbits=1,
+                                    xonxoff=False,
+                                    rtscts=False,
+                                    dsrdtr=False,
+                                    writeTimeout=1)
+        self.old_serial = serial.Serial('/dev/compass_old',
+                                    int(bps),
+                                    bytesize=serial.EIGHTBITS,
+                                    timeout=0.01,  # 不许改动
                                     parity=serial.PARITY_NONE,
                                     stopbits=1,
                                     xonxoff=False,
@@ -111,7 +121,8 @@ class Compass:
                 response = get_readline()
             except:
                 response = ""
-                print('warning: cannot get compass response')
+                # response = self.old_serial.readline()
+                print('warning: cannot get new_compass response')
         angle = self.bytesToAngle(response)
         return angle
 

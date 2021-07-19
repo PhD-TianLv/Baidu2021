@@ -12,7 +12,8 @@ front_camera = Camera(src=0)
 angle_predictor = init_angle_predictor()
 cart = Cart()
 
-cart.speed = settings.velocity
+
+cart.speed = cart.velocity = settings.velocity = 20
 
 while True:
     front_image = front_camera.read()

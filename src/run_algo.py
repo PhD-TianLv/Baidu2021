@@ -43,7 +43,7 @@ laser_ball = LaserBool(port=settings.laser_ball_port)
 
 def changeAnglePredictor():
     # 由于模型异常，需要在中途更换角度预测模型
-    settings.angleModelPath = 'models/train9'
+    settings.angleModelPath = 'models/train11'
     angle_predictor = init_angle_predictor()
     cart.velocity = cart.speed = settings.changeAngleVelocity
 
@@ -119,7 +119,7 @@ def detect_slow_down_and_stop(signResult, true_label, task_name, continue_time=2
         print('car stop, task {} ongoing'.format(task_name))
 
     # 判断是否 slow_down
-    elif ymin > 0.25 and ongoing_list['status'] != 'slow_down':
+    elif ymin > 0.3 and ongoing_list['status'] != 'slow_down':
         ongoing_list['status'] = 'slow_down'
         print('car slow_down')
         # 从此刻开始获取 last_center_x
@@ -174,6 +174,26 @@ def end_moving():
     cart.force_stop()
 
 
+def timer_move1():
+    cart.force_steer(20, 0)
+    time.sleep(1.5)
+    cart.force_steer(20, -0.6)
+    time.sleep(2)
+    start_moving()
+
+
+def timer_move2():
+    cart.force_steer(20, 0)
+    time.sleep(3.5)
+    cart.force_steer(20, 0.6)
+    time.sleep(2.5)
+    cart.force_steer(20, 0)
+    time.sleep(1)
+    cart.force_steer(20, 0.6)
+    time.sleep(2.5)
+    start_moving()
+
+
 def calculate_bias(task_name):
     last_center_x = settings.ongoing_list['last_center_x']
     if last_center_x == -1:
@@ -192,8 +212,8 @@ def calculate_bias(task_name):
         raise Exception("The task_name is incorrect!")
 
     # 摄像头图片 x 坐标 --> 现实中 x 坐标
-    bias_x_cam = last_center_x - 0.5
-    coor_x = -bias_x_cam / 0.15 * 7
+    bias_x_cam = -(last_center_x - 0.4975)
+    coor_x = bias_x_cam * 12 / 0.3293
 
     # 根据给定的调整范围计算调整值
     if coor_x < posture_range[0]:
@@ -213,7 +233,16 @@ def adjust_posture(compass_angle, task_name):
     # 第一次原地旋转校正
     cart.turnToCompassAngle(compass_angle, compass)
 
+    # 后退，确定 last_center_x
+    cart.force_move([-8, -8, -8, -8])
+    time.sleep(4)
+    Thread(target=detect_last_center_x).start()
+    cart.force_move([8, 8, 8, 8])
+    time.sleep(4)
+    cart.force_stop()
+
     # 左右移动
+    time.sleep(3)
     bias = calculate_bias(task_name)
     print('task_name = {}, bias = {}'.format(task_name, bias))
     cart.posture_move(bias)
@@ -242,13 +271,20 @@ def fortress_task(flag_name, task_name):
     ongoing_list[task_name] = 'complete'
 
 
-def target_task(task_name, direction):
+def move_forward():
+    cart.force_move([20, 20, 20, 20])
+    time.sleep(2)
+
+
+def target_task(angle, task_name, direction):
     print('target_task start!')
     time.sleep(0.1)
 
     if direction == 'forward2backward':
         cart.force_steer(8, 0)
-        time.sleep(6)
+        time.sleep(4)
+        cart.force_stop()
+        cart.turnToCompassAngle(angle, compass)
         cart.force_steer(-8, 0)
     elif direction == 'backward':
         cart.force_steer(-8, 0)
@@ -263,7 +299,7 @@ def target_task(task_name, direction):
             diff.append(abs(dis_right - dis_left))
         str_dis_left = "%.2f" % dis_left
         str_dis_right = "%.2f" % dis_right
-        print('dis_left={}, dis_right={}, min_diff={}'.format(str_dis_left, str_dis_right, min(diff)))
+        # print('dis_left={}, dis_right={}, min_diff={}'.format(str_dis_left, str_dis_right, min(diff)))
 
         if -1 in [dis_left, dis_right] or dis_left >= 0.2 or dis_right >= 0.2:
             continue
@@ -275,6 +311,9 @@ def target_task(task_name, direction):
 
     time.sleep(0.1)
 
+    # 第三次调整位姿
+    cart.turnToCompassAngle(angle, compass)
+
     print('target servo')
     targetMotor.extent(continue_time=3)
 
@@ -285,12 +324,13 @@ def target_task(task_name, direction):
 
 def camping_task():
     cart.force_move([20, 20, 20, 20])
-    time.sleep(1.7)
+    time.sleep(1.5)
     cart.force_move([-8, -18, -8, -18])
     time.sleep(3.0)
     cart.force_move([-18, -8, -18, -8])
     time.sleep(3.0)
     cart.force_stop()
+    time.sleep(0.5)
     cart.turnToCompassAngle(settings.stdCompassAngle + 180, compass)
     cart.force_move([20, 20, 20, 20])
     time.sleep(0.7)
@@ -312,16 +352,20 @@ def camping_task():
     cart.force_move([8, 18, 8, 18])
     time.sleep(2.5)
     cart.force_stop()
+    time.sleep(0.5)
     cart.turnToCompassAngle(settings.stdCompassAngle + 180, compass)  # DEBUG, 需要修改
     ongoing_list['camping'] = 'complete'
 
 
 def fenglangjuxu_task():
+    cart.force_move([-8, -8, -8, -8])
+    time.sleep(2.5)
     cart.force_move([8, 8, 8, 8])
     print("forward on it")
     while not laser_square.read():
         # print(0)
         pass
+    time.sleep(0.2)
     print('laser square ok')
     cart.force_stop()
     print('soldier adjust has been complete!')
@@ -364,6 +408,36 @@ def test_compass_move():
     cart.turnToCompassAngle(stdCompassAngle, compass)
 
 
+def test_signResult():
+    while True:
+        front_image = front_camera.read()
+        signResult = getMark(front_image, sign_predictor, mode='sign')
+        try:
+            print((signResult[0][2][0] + signResult[0][2][2]) / 2)
+        except:
+            pass
+
+
+def test_timer_move1():
+    cart.force_steer(20, 0)
+    time.sleep(1.5)
+    cart.force_steer(20, -0.6)
+    time.sleep(2)
+    start_moving()
+
+
+def test_timer_move2():
+    cart.force_steer(20, 0)
+    time.sleep(3.5)
+    cart.force_steer(20, 0.6)
+    time.sleep(2.5)
+    cart.force_steer(20, 0)
+    time.sleep(0.5)
+    cart.force_steer(20, 0.6)
+    time.sleep(2.5)
+    start_moving()
+
+
 if __name__ == '__main__':
-    test_compass_move()
+    test_timer_move2()
     pass

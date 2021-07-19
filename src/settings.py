@@ -3,18 +3,18 @@ import sys
 
 # -------global settings-------
 # 设置是否自动测量 stdCompassAngle
-measureCompassAngle = False
+measureCompassAngle = True
 # 现在是设置为手动测量
-stdCompassAngle = 270
+stdCompassAngle = 184.2
 
 target_posture_range = (0, 1.5)
-camping_posture_range = (-1.5, 0)
-fenglangjuxu_posture_range = (1, 3)
-soldier_posture_range = (2.5, 3)
-after_soldier_posture_range = (-6, -4)
+camping_posture_range = (-1, 1)
+fenglangjuxu_posture_range = (0, 2)
+soldier_posture_range = (3.5, 4.5)
+after_soldier_posture_range = (-1.5, -1.5)
 
 # 车辆运行速度
-velocity = 15
+velocity = 40
 slow_down_speed = 15
 # 中途更换模型后的调整速度
 changeAngleVelocity = 20
@@ -29,7 +29,7 @@ laser_square_port = "laser_square"
 laser_ball_port = "laser_ball"
 laser1_port = "laser1"
 laser2_port = "laser2"
-compass_port = "compass"
+compass_port = "compass_new"
 
 # -------collect.py-------
 resultDir = "train/"
@@ -38,7 +38,7 @@ recordSideCam = False
 
 # -------run_lane.py-------
 # train7可以跑过两个急转弯
-angleModelPath = 'models/train9'
+angleModelPath = 'models/train4'
 
 # -------marker.py--------
 score_thresold = 0.7

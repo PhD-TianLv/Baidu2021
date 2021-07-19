@@ -4,7 +4,7 @@ from ctypes import *
 from widgets import serial_connection
 import settings
 import time
-from compass import Compass
+from compass_prepare import Compass
 
 comma_head_01_motor = bytes.fromhex('77 68 06 00 02 0C 02 01')
 comma_head_02_motor = bytes.fromhex('77 68 06 00 02 0C 02 02')
@@ -140,11 +140,10 @@ class Cart:
         # bias > 0 表示向右移, bias < 0 表示向左移
         if bias == 0:
             return
-        direction = bias / abs(bias)
 
         if abs(bias) > 7.1:
             drivetime = 1.5
-        if abs(bias) > 4.3:
+        elif abs(bias) > 4.3:
             drivetime = 1
         elif abs(bias) > 2.6:
             drivetime = 0.9
@@ -157,7 +156,7 @@ class Cart:
         else:
             return
 
-        if direction > 0:
+        if bias > 0:
             self.force_move([-15, 0, -15, 0])
             time.sleep(drivetime)
             self.force_move([0, -15, 0, -15])
@@ -165,7 +164,7 @@ class Cart:
             self.force_move([15, 15, 15, 15])
             time.sleep(drivetime)
             self.force_stop()
-        elif direction < 0:
+        elif bias < 0:
             self.force_move([0, -15, 0, -15])
             time.sleep(drivetime)
             self.force_move([-15, 0, -15, 0])
@@ -183,15 +182,15 @@ class Cart:
         print('target_angle = {}'.format(angle))
         print("start_angle = {}".format(compass.read()))
         # 如果相差 4° 以上，则手动加大偏转角度
-        if 4 <= compass.read() - angle < 9 or -356 <= compass.read() - angle < -351:
+        if 4 <= compass.read() - angle < 12 or -356 <= compass.read() - angle < -348:
             for i in range(4):
                 self.move([-15, 15, -15, 15])  # 往右转，增大偏转角
                 time.sleep(0.0001)
             stdtime = time.time()
-            now_angle = compass.read()
-            while 4 <= now_angle - angle < 9 or -356 <= now_angle - angle < -351:
-                now_angle = compass.read()
+            while 4 <= compass.read() - angle < 12 or -356 <= compass.read() - angle < -348:
                 if time.time() - stdtime > 4:
+                    cart.force_steer(40, 0)
+                    time.sleep(0.5)
                     break  # 防卡顿
                 # print(compass.read())
                 pass
@@ -203,16 +202,16 @@ class Cart:
                 time.sleep(0.0001)
             self.force_stop()
             # print('last3_angle = {}'.format(compass.read()))
-        if -9 < compass.read() - angle <= -4 or 351 <= compass.read() - angle < 356:
+        if -12 < compass.read() - angle <= -4 or 348 <= compass.read() - angle < 356:
             for i in range(4):
                 self.move([15, -15, 15, -15])
                 time.sleep(0.0001)
             stdtime = time.time()
-            now_angle = compass.read()
-            while 4 <= now_angle - angle < 9 or -360 < now_angle - angle <= -351:
+            while -12 <= compass.read() - angle < -4 or 348 < compass.read() - angle <= 356:
                 if time.time() - stdtime > 4:
+                    cart.force_steer(40, 0)
+                    time.sleep(0.5)
                     break  # 防卡顿
-                now_angle = compass.read()
                 # print(compass.read())
                 pass
             # print('last1_angle = {}'.format(compass.read()))
@@ -232,12 +231,12 @@ class Cart:
                 self.move([15, -15, 15, -15])
                 time.sleep(0.0001)
             stdtime = time.time()
-            now_angle = compass.read()
-            while 9 <= now_angle - angle < 40 or -351 <= now_angle - angle <= -311:
+            while 9 <= compass.read() - angle < 40 or -351 <= compass.read() - angle <= -311:
                 if time.time() - stdtime > 4:
+                    cart.force_steer(40, 0)
+                    time.sleep(0.5)
                     break  # 防卡顿
-                now_angle = compass.read()
-                print(now_angle)
+                # print(now_angle)
                 pass
             print('last1_angle = {}'.format(compass.read()))
             self.move([0, 0, 0, 0])
@@ -253,12 +252,12 @@ class Cart:
                 self.move([-15, 15, -15, 15])
                 time.sleep(0.0001)
             stdtime = time.time()
-            now_angle = compass.read()
-            while -40 <= now_angle - angle <= -9 or 311 <= now_angle - angle <= 351:
+            while -40 <= compass.read() - angle <= -9 or 311 <= compass.read() - angle <= 351:
                 if time.time() - stdtime > 4:
+                    cart.force_steer(40, 0)
+                    time.sleep(0.5)
                     break  # 防卡顿
-                now_angle = compass.read()
-                print(now_angle)
+                # print(now_angle)
                 pass
             print('last1_angle = {}'.format(compass.read()))
             self.move([0, 0, 0, 0])

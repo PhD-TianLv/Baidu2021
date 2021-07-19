@@ -365,7 +365,7 @@ def test_soldier():
 
 
 def test_compass():
-    from compass import Compass
+    from compass_prepare import Compass
     compass = Compass(1)
     while True:
         print(compass.read())
@@ -433,7 +433,7 @@ def test_run_algo_posture_move():
 
 def test_turn_in_circles():
     from cart import Cart
-    from compass import Compass
+    from compass_prepare import Compass
     cart = Cart()
     compass = Compass(port=3)
     time.sleep(1)  # 初始化

@@ -30,12 +30,12 @@ flag_names = ['dunhuang', 'dingxiangjun', 'daijun']
 ongoing_list['fortress1'] = 'complete'
 ongoing_list['fortress2'] = 'complete'
 ongoing_list['target1'] = 'complete'
-ongoing_list['target2'] = 'complete'
-ongoing_list['target3'] = 'complete'
-ongoing_list['camping'] = 'complete'
-ongoing_list['fenglangjuxu'] = 'complete'
-settings.velocity = 10
-ongoing_list['soldier'] = 'complete'
+# ongoing_list['target2'] = 'complete'
+# ongoing_list['target3'] = 'complete'
+# ongoing_list['camping'] = 'complete'
+# ongoing_list['fenglangjuxu'] = 'complete'
+# settings.velocity = 20
+# ongoing_list['soldier'] = 'complete'
 
 print("Init finished")
 
@@ -75,25 +75,25 @@ while True:
                                       continue_time=3, target1_stdtime=target1_stdtime)
         elif ongoing_list['target1'] == 'ongoing':
             adjust_posture(settings.stdCompassAngle + 90, task_name='target')
-            target_task(task_name='target1', direction='forward2backward')
+            target_task(settings.stdCompassAngle + 90, task_name='target1', direction='forward2backward')
             start_moving()
 
     elif ongoing_list['target2'] != 'complete':
         if signResult and ongoing_list['target2'] == 'uncomplete':
             detect_slow_down_and_stop(signResult, true_label='target', task_name='target2',
-                                      continue_time=1.7)
+                                      continue_time=2)
         elif ongoing_list['target2'] == 'ongoing':
             adjust_posture(settings.stdCompassAngle + 90, task_name='target')
-            target_task(task_name='target2', direction='forward2backward')
+            target_task(settings.stdCompassAngle + 90, task_name='target2', direction='forward2backward')
             start_moving()
 
     elif ongoing_list['target3'] != 'complete':
         if signResult and ongoing_list['target3'] == 'uncomplete':
             detect_slow_down_and_stop(signResult, true_label='target', task_name='target3',
-                                      continue_time=1.7)
+                                      continue_time=2)
         elif ongoing_list['target3'] == 'ongoing':
             adjust_posture(settings.stdCompassAngle + 180, task_name='target')
-            target_task(task_name='target3', direction='forward2backward')
+            target_task(settings.stdCompassAngle + 180, task_name='target3', direction='forward2backward')
             start_moving()
 
     elif ongoing_list['camping'] != 'complete':
@@ -107,12 +107,12 @@ while True:
     elif ongoing_list['fenglangjuxu'] != 'complete':
         if signResult and ongoing_list['fenglangjuxu'] == 'uncomplete':
             detect_slow_down_and_stop(signResult, true_label='fenglangjuxu', task_name='fenglangjuxu',
-                                      continue_time=1.7)
+                                      continue_time=2)
         elif ongoing_list['fenglangjuxu'] == 'ongoing':
             adjust_posture(settings.stdCompassAngle + 270, task_name='fenglangjuxu')
             fenglangjuxu_task()
             # changeAnglePredictor()
-            start_moving()
+            timer_move1()
 
     elif ongoing_list['soldier'] != 'complete':
         if signResult and ongoing_list['soldier'] == 'uncomplete':
@@ -120,9 +120,8 @@ while True:
         elif ongoing_list['soldier'] == 'ongoing':
             adjust_posture(settings.stdCompassAngle + 380, task_name='soldier')
             soldier_task()
-            changeAnglePredictor()
             adjust_posture(settings.stdCompassAngle + 380, task_name='after_soldier')
-            start_moving()
+            timer_move2()
 
     elif ongoing_list['fortress3'] != 'complete':
         if signResult and ongoing_list['fortress3'] == 'uncomplete':

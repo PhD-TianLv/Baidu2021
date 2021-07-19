@@ -8,7 +8,7 @@ import json
 os.chdir('D:/WorkSpace/Baidu2021')
 
 all_dir_path = 'data/temp'
-out_path = 'data/train10'
+out_path = 'data/train11'
 json_path = 'data/json'
 
 for dir_path in os.listdir(all_dir_path):
