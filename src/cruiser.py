@@ -31,6 +31,7 @@ def init_predictor():
     )
     config = CxxConfig()
     model_dir = settings.angleModelPath
+    print('model_dir = {}'.format(model_dir))
     if not os.path.exists(os.path.join(model_dir, "model")):
         raise Exception("model file does not exists")
     config.set_model_file(os.path.join(model_dir, "model"))

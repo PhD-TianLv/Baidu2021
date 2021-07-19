@@ -1,50 +1,80 @@
 import serial
-import time
+import signal
 from threading import Thread
+
+import settings
+
+
+def set_timeout(num):
+    def wrap(func):
+        def handle(signum, frame):  # 收到信号 SIGALRM 后的回调函数，第一个参数是信号的数字，第二个参数是the interrupted stack frame.
+            raise RuntimeError
+
+        def to_do(*args, **kwargs):
+            try:
+                signal.signal(signal.SIGALRM, handle)  # 设置信号和回调函数
+                signal.alarm(num)  # 设置 num 秒的闹钟
+                # print('start alarm signal.')
+                r = func(*args, **kwargs)
+                # print('close alarm signal.')
+                signal.alarm(0)  # 关闭闹钟
+                return r
+            except RuntimeError as e:
+                print('laser flush runtime out!')
+
+        return to_do
+
+    return wrap
 
 
 class Laser:
     def __init__(self, port):
-        self.ser = serial.Serial()
-        self.ser.port = "/dev/ttyUSB" + str(port)
-        self.ser.baudrate = 115200
-        self.ser.bytesize = serial.EIGHTBITS
-        self.ser.parity = serial.PARITY_NONE
-        self.ser.stopbits = serial.STOPBITS_ONE
-        self.ser.timeout = 1
-        self.ser.xonxoff = False
-        self.ser.rtscts = False
-        self.ser.dsrdtr = False
-        self.ser.writeTimeout = 2
-        self.distance = -1
+        portx = "/dev/" + str(port)
+        bps = 115200
+        self.serial = serial.Serial(portx,
+                                    int(bps),
+                                    timeout=0.01,
+                                    parity=serial.PARITY_NONE,
+                                    stopbits=1)
 
         try:
-            self.ser.open()
+            self.serial.open()
         except Exception as e:
-            raise Exception("error open serial port: " + str(e))
-
-        self.run_flag = True
-        self.start()
-
-    def start(self):
-        Thread(target=self.update, args=()).start()
-
-    def stop(self):
-        self.run_flag = False
+            if not str(e) == 'Port is already open.':
+                raise Exception("error open serial port: " + str(e))
 
     def read(self):
-        return self.distance
+        @set_timeout(1)
+        def flushclear():
+            self.serial.flushInput()
+            self.serial.flushOutput()
 
-    def update(self):
-        while self.run_flag:
-            response = self.ser.readline()
+        try:
+            flushclear()
+        except:
+            pass
+
+        distance = None
+        while not distance:
             try:
-                self.distance = float(response.decode('utf-8'))
+                flushclear()
             except:
                 pass
 
+            response = self.serial.readline()
+            try:
+                distance = float(response.decode('utf-8'))
+            except:
+                distance = None
+                # print('warning: laser cannot get response!')
+        return distance
 
-if __name__ == '__main__':
+
+def test_laser():
+    laser = Laser(2)
+    while True:
+        print(laser.read())
+
     from cart import Cart
     from threading import Lock
 
@@ -88,3 +118,13 @@ if __name__ == '__main__':
 
         print("laser_left=%.2f,laser_right=%.2f" % (laser_left.read(), laser_right.read()) + ",turn={}".format(
             turn))
+
+
+if __name__ == '__main__':
+    laser1 = Laser(port=settings.laser1_port)
+    laser2 = Laser(port=settings.laser2_port)
+    # print(laser1.read())
+    # print(laser2.read())
+    while True:
+        print(laser1.read(), laser2.read())
+        pass

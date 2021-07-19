@@ -1,6 +1,6 @@
 import time
 import struct
-import threading
+from threading import Thread
 from serial_port import serial_connection
 
 serial = serial_connection
@@ -108,15 +108,46 @@ class Servo:
     def __init__(self, ID):  # left: angle=120, right: angle=-60, speed=50
         self.ID = ID
         self.ID_str = '{:02x}'.format(ID)
+        # print(self.ID_str)
 
     def servocontrol(self, angle, speed):
         cmd_servo_data = bytes.fromhex('77 68 06 00 02 36') \
                          + bytes.fromhex(self.ID_str) \
                          + speed.to_bytes(1, byteorder='big', signed=True) \
                          + angle.to_bytes(1, byteorder='big', signed=True) + bytes.fromhex('0A')
-        for i in range(2):
+
+        for i in range(4):
             serial.write(cmd_servo_data)
-        #     time.sleep(0.3)
+        stdtime = time.time()
+        while time.time() - stdtime < 1:
+            for i in range(4):
+                serial.write(cmd_servo_data)
+            time.sleep(0.1)
+
+
+class BottomServo(Servo):
+    def __init__(self, ID=2):
+        super(BottomServo, self).__init__(ID)
+
+    def servocontrol(self, angle, speed):
+        cmd_servo_data = bytes.fromhex('77 68 06 00 02 36') \
+                         + bytes.fromhex(self.ID_str) \
+                         + speed.to_bytes(1, byteorder='big', signed=True) \
+                         + angle.to_bytes(1, byteorder='big', signed=True) + bytes.fromhex('0A')
+
+        serial.write(cmd_servo_data)
+        stdtime = time.time()
+        while time.time() - stdtime < 1:
+            serial.write(cmd_servo_data)
+            time.sleep(0.4)
+
+    def down(self):
+        self.servocontrol(-20, 70)
+        time.sleep(1)
+
+    def up(self):
+        self.servocontrol(-70, 70)
+        time.sleep(1)
 
 
 class Servo_pwm:
@@ -127,16 +158,94 @@ class Servo_pwm:
     def servocontrol(self, angle, speed):
         cmd_servo_data = bytes.fromhex('77 68 06 00 02 0B') + bytes.fromhex(self.ID_str) \
                          + speed.to_bytes(1, byteorder='big', signed=True) \
-                         + angle.to_bytes(1, byteorder='big', signed=True) \
+                         + angle.to_bytes(1, byteorder='big', signed=False) \
                          + bytes.fromhex('0A')
+
         serial.write(cmd_servo_data)
-        # time.sleep(0.3)
+        stdtime = time.time()
+        while time.time() - stdtime < 0.1:
+            serial.write(cmd_servo_data)
+            time.sleep(0.01)
+
+
+class CamServo(Servo_pwm):
+    def __init__(self, ID):
+        super(CamServo, self).__init__(ID)
+
+    def center(self):
+        self.servocontrol(60, 30)
+
+    def left(self):
+        pass
+
+
+class FlagServo(Servo_pwm):
+    def __init__(self, ID):
+        super(FlagServo, self).__init__(ID)
 
     def up(self):
-        self.servocontrol(120, 100)
+        for i in range(2):
+            self.servocontrol(90, 60)
+            time.sleep(0.5)
 
     def down(self):
-        self.servocontrol(30, 100)
+        for i in range(2):
+            self.servocontrol(30, 60)
+            time.sleep(0.5)
+
+
+class ClipServo(Servo):
+    def __init__(self, ID=1):
+        super(ClipServo, self).__init__(ID)
+
+    def servocontrol(self, angle, speed):
+        cmd_servo_data = bytes.fromhex('77 68 06 00 02 36') \
+                         + bytes.fromhex(self.ID_str) \
+                         + speed.to_bytes(1, byteorder='big', signed=True) \
+                         + angle.to_bytes(1, byteorder='big', signed=True) + bytes.fromhex('0A')
+
+        serial.write(cmd_servo_data)
+        stdtime = time.time()
+        while time.time() - stdtime < 1:
+            serial.write(cmd_servo_data)
+            time.sleep(0.4)
+
+    def clamp(self):
+        self.servocontrol(-30, 70)
+        time.sleep(1.5)
+        self.servocontrol(-20, 70)
+        time.sleep(0.5)
+
+    def loose(self):
+        self.servocontrol(90, 70)
+        time.sleep(1.5)
+
+
+class SoldierServo(Servo_pwm):
+    def __init__(self, ID):
+        super(SoldierServo, self).__init__(ID)
+
+    def servocontrol(self, angle, speed):
+        cmd_servo_data = bytes.fromhex('77 68 06 00 02 0B') + bytes.fromhex(self.ID_str) \
+                         + speed.to_bytes(1, byteorder='big', signed=True) \
+                         + angle.to_bytes(1, byteorder='big', signed=False) \
+                         + bytes.fromhex('0A')
+
+        serial.write(cmd_servo_data)
+        stdtime = time.time()
+        while time.time() - stdtime < 1:
+            serial.write(cmd_servo_data)
+            time.sleep(0.1)
+
+    def up(self):
+        self.servocontrol(50, 30)
+        time.sleep(0.5)
+        self.servocontrol(45, 30)
+        time.sleep(0.5)
+
+    def down(self):
+        self.servocontrol(35, 30)
+        time.sleep(0.5)
 
 
 class Light:
@@ -152,9 +261,16 @@ class Light:
         cmd_servo_data = bytes.fromhex('77 68 08 00 02 3B {} {} {} {} {} 0A'.format(self.port_str, which_str, Red_str \
                                                                                     , Green_str, Blue_str))
         serial.write(cmd_servo_data)
+        stdtime = time.time()
+        while time.time() - stdtime < 0.1:
+            serial.write(cmd_servo_data)
+            time.sleep(0.01)
 
     def lightgreen(self):
-        self.lightcontrol(self.port, 0, 80, 0)
+        self.lightcontrol(0, 0, 80, 0)
+
+    def lightred(self):
+        self.lightcontrol(0, 80, 0, 0)
 
     def lightoff(self):
         self.lightcontrol(0, 0, 0, 0)
@@ -169,7 +285,7 @@ class Light:
 class Motor_rotate:
     def __init__(self, port):
         self.port = port
-        self.port_str = '{:02x}'.format(port)
+        self.port_str = '{:02x}'.format(port) if port <= 4 else '{:02x}'.format(port - 4)
 
     def motor_rotate(self, speed):
         if self.port in [1, 2, 3, 4]:
@@ -180,6 +296,42 @@ class Motor_rotate:
                              speed.to_bytes(1, byteorder='big', signed=True) + bytes.fromhex('0A')
         # print(cmd_servo_data) # DEBUG
         serial.write(cmd_servo_data)
+
+
+class SideMotor(Motor_rotate):
+    def __init__(self, port):
+        super(SideMotor, self).__init__(port)
+
+    def motor_rotate(self, speed):
+        if self.port in [1, 2, 3, 4]:
+            cmd_servo_data = bytes.fromhex('77 68 06 00 02 0C 02') + bytes.fromhex(self.port_str) + \
+                             speed.to_bytes(1, byteorder='big', signed=True) + bytes.fromhex('0A')
+        elif self.port in [5, 6, 7, 8]:
+            cmd_servo_data = bytes.fromhex('77 68 06 00 02 0C 01') + bytes.fromhex(self.port_str) + \
+                             speed.to_bytes(1, byteorder='big', signed=True) + bytes.fromhex('0A')
+        # print(cmd_servo_data) # DEBUG
+        serial.write(cmd_servo_data)
+        stdtime = time.time()
+        while time.time() - stdtime < 0.1:
+            serial.write(cmd_servo_data)
+            time.sleep(0.01)
+
+    def shrink(self):
+        self.motor_rotate(-70)
+        time.sleep(1.5)
+        self.motor_rotate(0)
+
+    def extent(self, continue_time=3):
+        stdtime = time.time()
+        self.motor_rotate(40)
+        while time.time() - stdtime < continue_time:
+            self.motor_rotate(40)
+            time.sleep(0.1)
+
+        stdtime = time.time()
+        while time.time() - stdtime < 0.1:
+            self.motor_rotate(0)
+            time.sleep(0.01)
 
 
 #红外测距传感器

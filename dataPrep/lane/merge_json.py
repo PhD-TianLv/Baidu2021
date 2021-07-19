@@ -1,5 +1,6 @@
 import json
 import os
+import re
 
 
 def merge_json(json_path='../data/json/', output_path='../data/result.json'):
@@ -10,6 +11,9 @@ def merge_json(json_path='../data/json/', output_path='../data/result.json'):
     """
     print('-' * 64, 'Start the merge_json task', sep='\n')
     json_names = os.listdir(json_path)
+    if 'result.json' in json_names:
+        json_names.remove('result.json')
+    json_names.sort(key=lambda name: int(''.join(re.findall(r'\d', name))))
 
     # 排除文件夹中非 .json 的文件
     for json_name in json_names.copy():
@@ -41,6 +45,7 @@ def merge_json(json_path='../data/json/', output_path='../data/result.json'):
 
 
 if __name__ == '__main__':
-    json_path = '../../data/json/'
-    output_path = '../data/json/result.json'
+    os.chdir('D:/WorkSpace/Baidu2021')
+    json_path = 'data/json/'
+    output_path = 'data/json/result.json'
     merge_json(json_path, output_path)

@@ -43,7 +43,7 @@ def sortPNG_XML():
 
 
 def renamePNG_XML():
-    dir_name = 'fortress2'
+    dir_name = 'camping'
     png_dir = os.path.join('./', dir_name, 'png')
     xml_dir = os.path.join('./', dir_name, 'xml')
 
@@ -112,11 +112,11 @@ def reform_label(suffix='png'):
                 if label_cnt[name] % 10 == 0:
                     # eval_txt.write(f"data/{name}/{suffix}/{ID}.{suffix}\t{{\"value\":\"{name}\","
                     #                f"\"coordinate\":[[{xmin},{ymin}],[{xmax},{ymax}]]}}\n")
-                    eval_txt.write(f'data/{name}/{suffix}/{ID}.{suffix}\tdata/{name}/xml/{ID}.xml\n')
+                    eval_txt.write(f'{name}/{suffix}/{ID}.{suffix}\t{name}/xml/{ID}.xml\n')
                 else:
                     # train_txt.write(f"data/{name}/{suffix}/{ID}.{suffix}\t{{\"value\":\"{name}\","
                     #                 f"\"coordinate\":[[{xmin},{ymin}],[{xmax},{ymax}]]}}\n")
-                    train_txt.write(f'data/{name}/{suffix}/{ID}.{suffix}\tdata/{name}/xml/{ID}.xml\n')
+                    train_txt.write(f'{name}/{suffix}/{ID}.{suffix}\t{name}/xml/{ID}.xml\n')
 
 
 def rename_sideData(suffix='png'):
@@ -208,9 +208,16 @@ def expand_dataset(begin_cnt=51, target_cnt=600):
             cnt += 1
 
 
+def renamePNG():
+    img_names = os.listdir('./')
+    for index, img_name in enumerate(img_names):
+        new_img_name = str(index) + '.png'
+        os.rename(img_name, new_img_name)
+
+
 if __name__ == '__main__':
     work_dir = 'D:/WorkSpace/Baidu2021'
-    dataset_dir = 'data/sideData3'
+    dataset_dir = 'data/sideData5'
     os.chdir(os.path.join(work_dir, dataset_dir))
 
     reform_label()

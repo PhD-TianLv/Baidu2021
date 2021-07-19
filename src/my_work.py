@@ -166,8 +166,9 @@ def test_buzzer():
 
 
 def test_servo_pwm():
-    servo_pwm = Servo_pwm(5)
+    servo_pwm = Servo_pwm(4)
     while True:
+        servo_pwm.servocontrol(30, 100)
         servo_pwm.servocontrol(0, 100)
         servo_pwm.servocontrol(120, 100)
 
@@ -201,17 +202,7 @@ def test_preprocess(src):
 
 
 def test_mark():
-    import settings
-    from marker import init_predictor, ssd_preprocess, infer_ssd, analyse_res
-
-    predictor = init_predictor(model_dir=settings.markModelPath)
-    img_path = 'test_imgs/changqiezi_191.jpg'
-    img = cv2.imread(img_path)
-
-    data = test_preprocess(img)
-    res = infer_ssd(predictor, img, data)
-    result = analyse_res(res, debug=True)
-    print('result = {}'.format(result))
+    pass
 
 
 def test_work():
@@ -234,31 +225,230 @@ def test_work():
 
 def test_target():
     from laser import Laser
+    from widgets import SideMotor
+    targetMotor = SideMotor(8)
+    targetMotor.shrink()
     laser_left = Laser(port=2)
     laser_right = Laser(port=1)
     cart = Cart()
     cart.steer(8, 0)
+    time.sleep(0.1)
 
     while True:
         dis_left, dis_right = float(laser_left.read()), float(laser_right.read())
         str_dis_left = "%.2f" % dis_left
         str_dis_right = "%.2f" % dis_right
         print('dis_left={}, dis_right={}'.format(str_dis_left, str_dis_right))
+        # continue
         if -1 in [dis_left, dis_right] or dis_left >= 0.5 or dis_right >= 0.5:
             continue
         if abs(dis_left - dis_right) <= 0.04:
             cart.stop()
             print('car stop')
+            print('dis_left={}, dis_right={}'.format(str_dis_left, str_dis_right))
             break
+    laser_left.stop()
+    laser_right.stop()
+    time.sleep(0.1)
+
+    test_target_servo(targetMotor)
+
+
+def test_target_servo(targetMotor=None):
+    from widgets import SideMotor
+    if targetMotor is None:
+        targetMotor = SideMotor(8)
+    print('target servo')
+    while True:
+        targetMotor.extent(continue_time=3)
+        targetMotor.shrink()
 
 
 def test_run():
     cart = Cart()
-    cart.steer(10, 0)
+    cart.move([15, 3, 15, 3])
+    time.sleep(1)
+
+
+def test_camping():
+    from cart import Cart
+    cart = Cart()
+    # cart.force_move([0, -20, 0, -20])
+    # cart.stop()
+    # return
+
+    cart.force_move([20, 20, 20, 20])
+    time.sleep(2.2)
+    cart.force_move([-8, -18, -8, -18])
+    time.sleep(3.0)
+    cart.force_move([-18, -8, -18, -8])
+    time.sleep(3.0)
+
+    cart.stop()
+    time.sleep(2)
+
+    cart.force_move([18, 8, 18, 8])
+    time.sleep(2.8)
+    cart.force_move([18, 18, 18, 18])
+    time.sleep(0.6)
+    cart.force_move([8, 18, 8, 18])
+    time.sleep(2.8)
+
+    cart.stop()
+
+
+def test_posture(distance=5):
+    basespeed = 15
+    speed_ratio = 0.4
+
+    if distance < 2:
+        speed_ratio = 0.2
+        drivetime = distance * 0.95
+    elif distance < 4:
+        speed_ratio = 0.15
+        drivetime = distance * 0.75
+    else:
+        speed_ratio = -0.05
+        drivetime = distance * 0.25
+    l_speed = basespeed
+    r_speed = basespeed * speed_ratio
+    print('l_speed = {}, r_speed = {}'.format(l_speed, r_speed))
+    cart.move([l_speed, r_speed, l_speed, r_speed])
+    time.sleep(drivetime)
+
+    cart.stop()  # DEBUG
+
+    l_speed = basespeed * speed_ratio
+    r_speed = basespeed
+    print('l_speed = {}, r_speed = {}'.format(l_speed, r_speed))
+    cart.move([l_speed, r_speed, l_speed, r_speed])
+    time.sleep(drivetime)
+    l_speed = r_speed = -basespeed
+    cart.move([l_speed, r_speed, l_speed, r_speed])
+    time.sleep(drivetime)
+    cart.stop()
+
+
+def test_cam():
+    from camera import Camera
+    from cruiser import img_process
+    front_camera = Camera()
+
+    img = front_camera.read()
+    _, mask = img_process(img)
+    cv2.imwrite('test_hsv_img.png', mask)
+    print('save img')
+
+
+def test_fenglangjuxu():
+    from widgets import SideMotor, Servo_pwm
+    targetMotor = SideMotor(8)
+    clampServo = Servo_pwm(9)
+    bottomServo = Servo(2)
+    bottomServo.servocontrol(0, 30)
+    pass
+
+    # while True:
+    #     print('work successfully!')
+    #     clampServo.servocontrol(angle=0, speed=30)
+    #     time.sleep(1)
+    #     clampServo.servocontrol(angle=60, speed=30)
+    #     time.sleep(1)
+
+    # targetMotor.extent()
+
+
+def test_soldier():
+    from widgets import Servo_pwm
+    soldierServo = Servo_pwm(8)
+    soldierServo.servocontrol(0, 30)
+
+
+def test_compass():
+    from compass import Compass
+    compass = Compass(1)
+    while True:
+        print(compass.read())
+
+
+def detect_dis():
+    from camera import Camera
+    from marker import getResult, init_predictor
+    import settings
+
+    front_camera = Camera()
+    sign_predictor = init_predictor(settings.signModelPath)
+
+    while True:
+        front_image = front_camera.read()
+        signResult = getResult(front_image, sign_predictor, mode='sign')
+        if signResult:
+            xmin, xmax = signResult[0][2][0], signResult[0][2][2]
+            print("center = {}".format((xmin + xmax) / 2))
+
+
+def test_pos_move(drivetime=3):
+    l_speed = -15
+    r_speed = 0
+    cart.force_move([l_speed, r_speed, l_speed, r_speed])
+    time.sleep(drivetime)
+
+    l_speed = 0
+    r_speed = -15
+    cart.force_move([l_speed, r_speed, l_speed, r_speed])
+    time.sleep(drivetime)
+
+    l_speed = r_speed = 15
+    cart.force_move([l_speed, r_speed, l_speed, r_speed])
+    time.sleep(drivetime)
+
+    cart.force_stop()
+
+
+def test_target_move():
+    # 通过摄像头获取中心点
+    from camera import Camera
+    from marker import getResult, init_predictor
+    import settings
+
+    front_camera = Camera()
+    sign_predictor = init_predictor(settings.signModelPath)
+
+    front_image = front_camera.read()
+    signResult = getResult(front_image, sign_predictor, mode='sign')
+    xmin, xmax = signResult[0][2][0], signResult[0][2][2]
+    bias_x_cam = (xmin + xmax) / 2 - 0.5
+    coor_x = -bias_x_cam / 0.15 * 7
+    print(coor_x)
+
+    target_x = -1.25
+    bias = target_x - coor_x
+    test_posture(bias)
+
+
+def test_run_algo_posture_move():
+    from run_algo import posture_move
+    posture_move(-3)
+
+
+def test_turn_in_circles():
+    from cart import Cart
+    from compass import Compass
+    cart = Cart()
+    compass = Compass(port=3)
+    time.sleep(1)  # 初始化
+    if abs(compass.read() - 17) >= 4:  # 倒放352
+        cart.force_move([15, -15, 15, -15])
+    while abs(compass.read() - 17) >= 7:
+        pass
+    cart.force_stop()
+    print(compass.read())
 
 
 if __name__ == '__main__':
     import settings
+
+    # cart = Cart()
 
     # test_light(2, 'off')
     # test_motor(port=[1, 2, 3, 4], speed=-20)
@@ -268,12 +458,24 @@ if __name__ == '__main__':
     # test_img_cruiseModel()
     # test_joystick_run()
     # test_buzzer()
-    # test_servo(1)
+    # test_servo(2)
     # test_servo_pwm()
     # test_ultrasonicSensor()
     # test_button()
     # test_mark()
     # test_work()
-    test_target()
+    # test_target()
     # test_run()
+    # test_target_servo()
+    test_camping()
+    # test_posture(1)
+    # test_fenglangjuxu()
+    # test_soldier()
+    # test_compass()
+    # test_target_move()
+    # test_pos_move(0.8)
+    # test_run_algo_posture_move()
+    # test_turn_in_circles()
+
+    print('my work')
     pass

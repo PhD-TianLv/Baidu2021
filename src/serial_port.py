@@ -1,16 +1,21 @@
 import serial
-import time
+import settings
 
 from threading import Lock
 
 
 class Serial:
     def __init__(self):
-        portx = "/dev/ttyUSB0"
+        portx = "/dev/" + str(settings.wobot_port)
+        print('wobot_port = {}'.format(portx))
         bps = 115200
         self.res = None
-        self.serial = serial.Serial(portx, int(bps), timeout=1, parity=serial.PARITY_NONE, stopbits=1)
-        time.sleep(1)
+        self.serial = serial.Serial(portx,
+                                    int(bps),
+                                    timeout=0.01,
+                                    parity=serial.PARITY_NONE,
+                                    stopbits=1,
+                                    writeTimeout=0)
 
     def write(self, data):
         lock = Lock()
